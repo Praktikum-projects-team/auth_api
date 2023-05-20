@@ -1,0 +1,48 @@
+version: '3'
+services:
+  postgres:
+    container_name: postgres
+    image: "postgres:13"
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./movies_pg_dump.sql:/docker-entrypoint-initdb.d/movies_pg_dump.sql
+      - $HOME/postgresql/data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U app -d movies_database" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  redis:
+    container_name: redis
+    image: redis:7
+    env_file:
+      - ./.env
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    volumes:
+      - $HOME/redis/data:/var/lib/redis/data
+
+  auth:
+    container_name: auth
+    build: .
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/configs:/etc/nginx/conf.d:ro
+    depends_on:
+      - auth
+    ports:
+      - "80:80"
