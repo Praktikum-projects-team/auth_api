@@ -10,7 +10,6 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - ./movies_pg_dump.sql:/docker-entrypoint-initdb.d/movies_pg_dump.sql
       - $HOME/postgresql/data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U app -d movies_database" ]
@@ -36,6 +35,7 @@ services:
       - ./.env
     depends_on:
       - redis
+      - postgres
 
   nginx:
     image: nginx:latest
