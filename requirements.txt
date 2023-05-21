@@ -11,6 +11,7 @@ uvloop==0.17.0 ; sys_platform != "win32" and implementation_name == "cpython"
 backoff==2.2.1
 flask==2.3.2
 flask-marshmallow==0.15.0
+flask_sqlalchemy==3.0.3
 requests==2.30.0
 gevent==22.10.2
 sqlalchemy==2.0.15
