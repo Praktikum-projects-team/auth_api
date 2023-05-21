@@ -11,11 +11,9 @@ class Role(db.Model):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column(String, nullable=False)
-    description = Column(String, default='')
 
-    def __init__(self, name, description=None):
+    def __init__(self, name):
         self.name = name
-        self.description = description
 
     def __repr__(self):
         return f'<Role {self.name}(id: {self.id})>'
