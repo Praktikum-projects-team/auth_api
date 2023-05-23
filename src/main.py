@@ -1,7 +1,6 @@
 from flask import Flask
 
 from core import config
-from create_superuser import createsuperuser
 from db.pg_db import init_db, db
 
 app_config = config.AppConfig()
@@ -15,9 +14,6 @@ init_db(app=app)
 with app.app_context():
     from db import models
     db.create_all()
-
-with app.app_context():
-    createsuperuser()
 
 
 @app.route('/api/hello-world')
