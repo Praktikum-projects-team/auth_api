@@ -11,6 +11,8 @@ class AppConfig(BaseSettings):
     host: str = Field(..., env='APP_HOST')
     port: int = Field(..., env='APP_PORT')
     is_debug: bool = Field(..., env='IS_DEBUG')
+    superuser_login: str = Field(..., env='SUPERUSER_LOGIN')
+    superuser_password: str = Field(..., env='SUPERUSER_PASSWORD')
     # pg: PostgresDsn = PostgresDsn.build(...)
 
 
