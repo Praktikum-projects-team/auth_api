@@ -16,6 +16,9 @@ with app.app_context():
     from db import models
     db.create_all()
 
+with app.app_context():
+    createsuperuser()
+
 
 @app.route('/api/hello-world')
 def hello_world():
@@ -29,4 +32,3 @@ def hello_world():
 
 if __name__ == '__main__':
     app.run()
-    createsuperuser()
