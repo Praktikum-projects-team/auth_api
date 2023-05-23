@@ -29,3 +29,4 @@ class PostgresConfig(BaseSettings):
     user: str = Field(..., env='DB_USER')
     password: str = Field(..., env='DB_PASSWORD')
     database: str = Field(..., env='DB_NAME')
+    host_local: str = Field(..., env='DB_HOST_LOCAL')

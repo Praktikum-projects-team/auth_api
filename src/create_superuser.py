@@ -1,11 +1,11 @@
 import argparse
 
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 from constants import RoleName
 from core.config import PostgresConfig
 from db.models import Role, User, UserRole
-from main import app
 
 parser = argparse.ArgumentParser(description='Create superuser')
 parser.add_argument('login', type=str, help='Superuser login')
@@ -15,7 +15,16 @@ args = parser.parse_args()
 
 db = SQLAlchemy()
 pg_conf = PostgresConfig()
-pg_dsn = f'postgresql://{pg_conf.user}:{pg_conf.password}@{pg_conf.host}:{pg_conf.port}/{pg_conf.database}'
+pg_dsn = f'postgresql://{pg_conf.user}:{pg_conf.password}@{pg_conf.host_local}:{pg_conf.port}/{pg_conf.database}'
+
+
+def init_db(app: Flask):
+    app.config['SQLALCHEMY_DATABASE_URI'] = pg_dsn
+    db.init_app(app)
+
+
+app = Flask(__name__)
+init_db(app=app)
 
 
 def createsuperuser(login, password):
