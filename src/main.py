@@ -1,6 +1,7 @@
 from flask import Flask
 
 from core import config
+from create_superuser import createsuperuser
 from db.pg_db import init_db, db
 
 app_config = config.AppConfig()
@@ -28,3 +29,4 @@ def hello_world():
 
 if __name__ == '__main__':
     app.run()
+    createsuperuser()

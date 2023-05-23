@@ -2,13 +2,11 @@ from constants import RoleName
 from core.config import AppConfig
 from db.models import Role, User, UserRole
 from db.pg_db import db
-from main import app
 
 app_conf = AppConfig()
 
 
 def createsuperuser():
-    db.create_all(app=app)
     user_exist = db.session.query(User).filter(User.login == app_conf.superuser_login).first()
     if user_exist:
         return "Superuser already exist"
