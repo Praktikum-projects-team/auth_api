@@ -5,12 +5,11 @@ from flask import request
 from flask import Blueprint
 
 
-from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
 
-from api.v1.models.auth import sign_up_in, login_in
+from api.v1.models.auth import sign_up_in, login_in, login_out
 from services.auth.auth_service import sign_up_user, login_user, UserAlreadyExists, UserIncorrectLoginData
 
 auth_bp = Blueprint('auth', __name__)
@@ -31,13 +30,13 @@ def sign_up():
     except UserAlreadyExists as err:
         return str(err), HTTPStatus.CONFLICT
 
-    access_token = create_access_token(identity=user.login)  # TODO improve tokens
-    return jsonify(access_token=access_token)
+    return 'user created', HTTPStatus.OK
 
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
     json_data = request.get_json()
+    user_agent = request.headers.get('User-Agent', default='unknown device')
     if not json_data:
         return {"message": "No input data provided"}, HTTPStatus.BAD_REQUEST
     try:
@@ -46,11 +45,11 @@ def login():
         return err.messages, HTTPStatus.UNPROCESSABLE_ENTITY
 
     try:
-        tokens = login_user(user['login'], user['password'])
+        tokens = login_user(user['login'], user['password'], user_agent=user_agent)
     except UserIncorrectLoginData as err:
-        return err, HTTPStatus.FORBIDDEN
+        return err, HTTPStatus.UNAUTHORIZED
 
-    return tokens
+    return login_out.dump(tokens)
 
 
 # @app.route("/protected", methods=["GET"])

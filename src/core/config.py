@@ -1,4 +1,5 @@
 import os
+import datetime
 
 from pydantic import BaseSettings, Field, PostgresDsn
 
@@ -31,3 +32,5 @@ class AppConfig(BaseSettings):
     SQLALCHEMY_DATABASE_URI: PostgresDsn =\
         f'postgresql://{pg_conf.user}:{pg_conf.password}@{pg_conf.host}:{pg_conf.port}/{pg_conf.database}'
     JWT_SECRET_KEY: str = Field(..., env='JWT_SECRET_KEY')
+    JWT_ACCESS_TOKEN_EXPIRES: datetime.timedelta = datetime.timedelta(minutes=30)
+    JWT_REFRESH_TOKEN_EXPIRES: datetime.timedelta = datetime.timedelta(days=14)
