@@ -2,11 +2,12 @@
 from marshmallow import fields, validate
 
 from api.v1.models.marshmallow_init import ma
+from db.models import Role
 
 
-class RoleBaseSchema(ma.Schema):
-    id = fields.UUID(required=True)
-    name = fields.String(required=True)
+class RoleBaseSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Role
 
 
 class RoleNameSchema(ma.Schema):
