@@ -12,9 +12,9 @@ backoff==2.2.1
 flask==2.3.2
 flask-marshmallow==0.15.0
 flask_sqlalchemy==3.0.3
-flask-security==3.0.0
 flask-jwt-extended==4.4.4
 requests==2.30.0
 gevent==22.10.2
 sqlalchemy==2.0.15
 psycopg2-binary==2.9.6
+passlib==1.7.4
