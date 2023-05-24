@@ -1,11 +1,11 @@
 import argparse
+import uuid
+from datetime import datetime
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+import psycopg2
 
 from constants import RoleName
 from core.config import PostgresConfig
-from db.models import Role, User, UserRole
 
 parser = argparse.ArgumentParser(description='Create superuser')
 parser.add_argument('login', type=str, help='Superuser login')
@@ -13,43 +13,59 @@ parser.add_argument('password', type=str, help='Superuser password')
 
 args = parser.parse_args()
 
-db = SQLAlchemy()
 pg_conf = PostgresConfig()
-pg_dsn = f'postgresql://{pg_conf.user}:{pg_conf.password}@{pg_conf.host_local}:{pg_conf.port}/{pg_conf.database}'
-
-
-def init_db(app: Flask):
-    app.config['SQLALCHEMY_DATABASE_URI'] = pg_dsn
-    db.init_app(app)
-
-
-app = Flask(__name__)
-init_db(app=app)
+conn = psycopg2.connect(
+    database=pg_conf.database,
+    user=pg_conf.user,
+    password=pg_conf.password,
+    host=pg_conf.host_local,
+    port=pg_conf.port
+)
 
 
 def createsuperuser(login, password):
-    user_exist = db.session.query(User).filter(User.login == login).first()
+    user_id = str(uuid.uuid4())
+    role_id = str(uuid.uuid4())
+
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM users WHERE login = %s", (login,))
+        user_exist = cursor.fetchone()
     if user_exist:
         return "Superuser already exist"
 
-    superuser = User(login=login, password=password, is_superuser=True)
-    db.session.add(superuser)
-    db.session.commit()
+    with conn.cursor() as cursor:
+        created_at = datetime.utcnow()
+        cursor.execute(
+            "INSERT INTO users (id, login, password, is_superuser, created_at)"
+            "VALUES (%s, %s, %s, %s, %s)",
+            (user_id, login, password, True, created_at)
+        )
+        conn.commit()
 
-    role_exist = db.session.query(Role).filter(Role.name == RoleName.ADMIN).first()
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM roles WHERE name = %s", (RoleName.ADMIN,))
+        role_exist = cursor.fetchone()
+
     if not role_exist:
-        role = Role(name=RoleName.ADMIN)
-        db.session.add(role)
-        db.session.commit()
+        with conn.cursor() as cursor:
+            cursor.execute("INSERT INTO roles (id, name) VALUES (%s, %s)", (role_id, RoleName.ADMIN,))
+            conn.commit()
+    else:
+        role_id = role_exist[0]
 
-    role_id = db.session.query(Role.id).filter_by(name=RoleName.ADMIN).scalar()
+    given_at = datetime.utcnow()
+    with conn.cursor() as cursor:
+        cursor.execute(
+            "INSERT INTO user_roles (role_id, user_id, given_at)"
+            "VALUES (%s, %s, %s)",
+            (role_id, user_id, given_at)
+        )
+        conn.commit()
 
-    user_role = UserRole(user_id=superuser.id, role_id=role_id)
-    db.session.add(user_role)
-    db.session.commit()
+    conn.close()
+
     return "Superuser successfully created"
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        createsuperuser(args.login, args.password)
+    createsuperuser(args.login, args.password)
