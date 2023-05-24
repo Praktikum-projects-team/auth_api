@@ -1,10 +1,7 @@
-from flask import Flask
-from flask_marshmallow import Marshmallow
-from marshmallow import fields, Schema, validate
 
+from marshmallow import fields, validate
 
-app = Flask(__name__)
-ma = Marshmallow(app)
+from api.v1.models.marshmallow_init import ma
 
 
 class RoleBaseSchema(ma.Schema):
