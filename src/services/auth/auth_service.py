@@ -25,8 +25,9 @@ def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
     return token_in_redis is not None
 
 
-def add_token_to_block_list(jti):
-    jwt_redis_blocklist.set(jti, "", ex=app_config.JWT_ACCESS_TOKEN_EXPIRES)
+def add_token_to_block_list(jti, token_type):
+    ttl = app_config.JWT_ACCESS_TOKEN_EXPIRES if token_type == 'access' else app_config.JWT_REFRESH_TOKEN_EXPIRES
+    jwt_redis_blocklist.set(jti, "", ex=ttl)
 
 
 def sign_up_user(user):
@@ -37,15 +38,19 @@ def sign_up_user(user):
         raise UserAlreadyExists(f'user with login {user["login"]} already exists')
 
 
+def generate_token_pair(identity):
+    tokens = {
+        'access_token': create_access_token(identity=identity),
+        'refresh_token': create_refresh_token(identity=identity)
+    }
+    return tokens
+
+
 def login_user(login: str, password: str, user_agent: str):
     user = get_user_by_login(login)
     if not user or not verify_password(password=password, hashed_password=user.password):
         raise UserIncorrectLoginData('login or password is incorrect')
 
-    tokens = {
-        'access_token': create_access_token(identity=user.login),
-        'refresh_token': create_refresh_token(identity=user.login)
-    }
+    tokens = generate_token_pair(identity=user.login)
     add_login_history_record(user, user_agent=user_agent)
-
     return tokens

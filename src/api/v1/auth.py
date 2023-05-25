@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 
 from flask import jsonify, request, Blueprint
@@ -10,7 +11,7 @@ from services.auth.auth_service import (
     login_user,
     UserAlreadyExists,
     UserIncorrectLoginData,
-    add_token_to_block_list
+    add_token_to_block_list, generate_token_pair
 )
 
 
@@ -32,7 +33,7 @@ def sign_up():
     except UserAlreadyExists as err:
         return str(err), HTTPStatus.CONFLICT
 
-    return 'user created', HTTPStatus.OK
+    return jsonify(msg='user created'), HTTPStatus.CREATED
 
 
 @auth_bp.route('/login', methods=['POST'])
@@ -54,29 +55,26 @@ def login():
     return login_out.dump(tokens)
 
 
-# @auth_bp.route('/check_token', methods=['POST'])
-# @jwt_required()
-# def check_token():
-#     current_user = get_jwt_identity()
-#     return jsonify(logged_in_as=current_user), 200
+@auth_bp.route('/check_access_token', methods=['POST'])
+@jwt_required()
+def check_access_token():
+    current_user = get_jwt_identity()
+    return jsonify(user=current_user), HTTPStatus.OK
 
 
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required(verify_type=False)
 def logout():
     token = get_jwt()
-    add_token_to_block_list(token['jti'])
-    return jsonify(msg=f'{token["type"].capitalize()} token successfully revoked')
+    token_type = token["type"]
+    logging.info(token_type)
+    add_token_to_block_list(token['jti'], token_type)
+    return jsonify(msg=f'{token_type.capitalize()} token successfully revoked')
 
 
-# @auth_bp.route('/refresh', methods=['POST'])
-# @
-# def refresh():
-#     user_agent = request.headers.get('User-Agent', default='unknown device')
-#     try:
-#         tokens = refresh_token()
-#     except UserIncorrectLoginData as err:
-#         return err, HTTPStatus.UNAUTHORIZED
-#
-#     return login_out.dump(tokens)
-
+@auth_bp.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    identity = get_jwt_identity()
+    tokens = generate_token_pair(identity)
+    return login_out.dump(tokens)
