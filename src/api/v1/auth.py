@@ -11,7 +11,8 @@ from services.auth.auth_service import (
     login_user,
     UserAlreadyExists,
     UserIncorrectLoginData,
-    add_token_to_block_list, generate_token_pair
+    add_token_to_block_list,
+    generate_token_pair
 )
 
 
