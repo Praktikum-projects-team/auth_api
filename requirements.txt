@@ -3,7 +3,7 @@ pytest==6.2.5
 pre-commit==2.15.0
 python-dotenv==1.0.0
 pydantic==1.10.7
-redis==4.4.2
+redis==4.5.5
 orjson==3.8.10
 httptools==0.5.0
 gunicorn==20.1.0
@@ -12,8 +12,10 @@ backoff==2.2.1
 flask==2.3.2
 flask-marshmallow==0.15.0
 flask_sqlalchemy==3.0.3
+flask-jwt-extended==4.4.4
 requests==2.30.0
 gevent==22.10.2
 sqlalchemy==2.0.15
 psycopg2-binary==2.9.6
+passlib==1.7.4
 python-dotenv==1.0.0

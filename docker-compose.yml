@@ -25,8 +25,6 @@ services:
     image: redis:7
     env_file:
       - ./.env
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
       - $HOME/redis/data:/var/lib/redis/data
 
