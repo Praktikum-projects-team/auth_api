@@ -12,6 +12,7 @@ roles = Blueprint("roles", __name__)
 
 
 @roles.route("/", methods=["GET"])
+@validate()
 def roles_all():
     roles_db = Role.query.all()
     result = role_base_schema_all.dump(roles_db)
@@ -20,6 +21,7 @@ def roles_all():
 
 
 @roles.route('/', methods=['POST'])
+@validate()
 def role_create():
     role_data = request.get_json()
     role_name_errors = role_name_schema.validate(role_data)
@@ -39,6 +41,7 @@ def role_create():
 
 
 @roles.route("/<role_id>", methods=["GET"])
+@validate()
 def role_info(role_id: UUID4):
     role = Role.query.filter_by(id=role_id).first()
     if not role:
@@ -66,10 +69,9 @@ def role_update(role_id: UUID4):
     if name_exist:
         return {"msg": "Role with this name already exist"}, HTTPStatus.CONFLICT
 
-    new_role = Role(name=body['name'])
-    db.session.add(new_role)
+    role.name = body['name']
     db.session.commit()
-    return {"msg": "Role created successfully"}, HTTPStatus.CREATED
+    return {"msg": "Role updated successfully"}, HTTPStatus.CREATED
 
 
 @roles.route("/<role_id>", methods=["DELETE"])

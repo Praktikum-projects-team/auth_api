@@ -1,4 +1,3 @@
-
 from marshmallow import fields, validate
 
 from api.v1.models.marshmallow_init import ma
