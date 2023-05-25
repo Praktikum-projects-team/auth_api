@@ -1,10 +1,10 @@
 import argparse
 import uuid
 from datetime import datetime
+import logging
 
 import psycopg2
 
-from constants import RoleName
 from core.config import PostgresConfig
 
 parser = argparse.ArgumentParser(description='Create superuser')
@@ -25,12 +25,12 @@ conn = psycopg2.connect(
 
 def createsuperuser(login, password):
     user_id = str(uuid.uuid4())
-    role_id = str(uuid.uuid4())
 
     with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM users WHERE login = %s", (login,))
-        user_exist = cursor.fetchone()
+        cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE login = %s)", (login,))
+        user_exist = cursor.fetchone()[0]
     if user_exist:
+        logging.warning("Superuser already exist")
         return "Superuser already exist"
 
     with conn.cursor() as cursor:
@@ -42,28 +42,9 @@ def createsuperuser(login, password):
         )
         conn.commit()
 
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM roles WHERE name = %s", (RoleName.ADMIN,))
-        role_exist = cursor.fetchone()
-
-    if not role_exist:
-        with conn.cursor() as cursor:
-            cursor.execute("INSERT INTO roles (id, name) VALUES (%s, %s)", (role_id, RoleName.ADMIN,))
-            conn.commit()
-    else:
-        role_id = role_exist[0]
-
-    given_at = datetime.utcnow()
-    with conn.cursor() as cursor:
-        cursor.execute(
-            "INSERT INTO user_roles (role_id, user_id, given_at)"
-            "VALUES (%s, %s, %s)",
-            (role_id, user_id, given_at)
-        )
-        conn.commit()
-
     conn.close()
 
+    logging.warning("Superuser successfully created")
     return "Superuser successfully created"
 
 

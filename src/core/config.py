@@ -1,9 +1,10 @@
-import os
-
-from pydantic import BaseSettings, Field, PostgresDsn
 from dotenv import load_dotenv
 
 load_dotenv()
+
+import os
+
+from pydantic import BaseSettings, Field
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -14,7 +15,6 @@ class AppConfig(BaseSettings):
     host: str = Field(..., env='APP_HOST')
     port: int = Field(..., env='APP_PORT')
     is_debug: bool = Field(..., env='IS_DEBUG')
-    # pg: PostgresDsn = PostgresDsn.build(...)
 
 
 class RedisConfig(BaseSettings):
