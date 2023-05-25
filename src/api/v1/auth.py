@@ -21,17 +21,15 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/sign_up', methods=['POST'])
 def sign_up():
     json_data = request.get_json()
-    if not json_data:
-        return {"message": "No input data provided"}, HTTPStatus.BAD_REQUEST
     try:
         user = sign_up_in.load(json_data)
     except ValidationError as err:
-        return err.messages, HTTPStatus.UNPROCESSABLE_ENTITY
+        return jsonify(message=err.messages), HTTPStatus.UNPROCESSABLE_ENTITY
 
     try:
         sign_up_user(user)
     except UserAlreadyExists as err:
-        return str(err), HTTPStatus.CONFLICT
+        return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return jsonify(msg='user created'), HTTPStatus.CREATED
 
@@ -40,17 +38,15 @@ def sign_up():
 def login():
     json_data = request.get_json()
     user_agent = request.headers.get('User-Agent', default='unknown device')
-    if not json_data:
-        return {"message": "No input data provided"}, HTTPStatus.BAD_REQUEST
     try:
         user = login_in.load(json_data)
     except ValidationError as err:
-        return err.messages, HTTPStatus.UNPROCESSABLE_ENTITY
+        return jsonify(message=err.messages), HTTPStatus.UNPROCESSABLE_ENTITY
 
     try:
         tokens = login_user(user['login'], user['password'], user_agent=user_agent)
     except UserIncorrectLoginData as err:
-        return err, HTTPStatus.UNAUTHORIZED
+        return jsonify(message=str(err)), HTTPStatus.UNAUTHORIZED
 
     return login_out.dump(tokens)
 
@@ -69,7 +65,7 @@ def logout():
     token_type = token["type"]
     logging.info(token_type)
     add_token_to_block_list(token['jti'], token_type)
-    return jsonify(msg=f'{token_type.capitalize()} token successfully revoked')
+    return jsonify(msg=f'{token_type} token successfully revoked')
 
 
 @auth_bp.route('/refresh', methods=['POST'])

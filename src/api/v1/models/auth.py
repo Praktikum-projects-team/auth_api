@@ -4,7 +4,7 @@ from marshmallow import Schema, fields, ValidationError, pre_load
 
 class LoginIn(Schema):
     login = fields.Email(required=True)
-    password = fields.DateTime(dump_only=True)
+    password = fields.Str(required=True)
 
 
 class SignUpIn(LoginIn):
@@ -12,8 +12,8 @@ class SignUpIn(LoginIn):
 
 
 class LoginOut(Schema):
-    access_token = fields.Str
-    refresh_token = fields.Str
+    access_token = fields.Str(required=True)
+    refresh_token = fields.Str(required=True)
 
 
 login_in = LoginIn()

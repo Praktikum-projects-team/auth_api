@@ -52,5 +52,5 @@ def login_user(login: str, password: str, user_agent: str):
         raise UserIncorrectLoginData('login or password is incorrect')
 
     tokens = generate_token_pair(identity=user.login)
-    add_login_history_record(user, user_agent=user_agent)
+    add_login_history_record(user_id=user.id, user_agent=user_agent)
     return tokens

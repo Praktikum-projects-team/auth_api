@@ -1,7 +1,8 @@
+import logging
 import os
 import datetime
 
-from pydantic import BaseSettings, Field, PostgresDsn
+from pydantic import BaseSettings, Field, PostgresDsn, validator
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -23,16 +24,20 @@ pg_conf = PostgresConfig()
 
 
 class AppConfig(BaseSettings):
-    # base_dir: str = BASE_DIR
-    # host: str = Field(..., env='APP_HOST')
-    # port: int = Field(..., env='APP_PORT')
-    # is_debug: bool = Field(..., env='IS_DEBUG')
-    # pg: PostgresDsn = PostgresDsn.build(...)
     SQLALCHEMY_DATABASE_URI: PostgresDsn =\
-        f'postgresql://{pg_conf.user}:{pg_conf.password}@{pg_conf.host}:{pg_conf.port}/{pg_conf.database}'
+        f'postgresql://{pg_conf.user}:{pg_conf.password}@{pg_conf.host}:{pg_conf.port}/{pg_conf.database}'  # .build(..)
     JWT_SECRET_KEY: str = Field(..., env='JWT_SECRET_KEY')
-    JWT_ACCESS_TOKEN_EXPIRES: datetime.timedelta = datetime.timedelta(minutes=30)
-    JWT_REFRESH_TOKEN_EXPIRES: datetime.timedelta = datetime.timedelta(days=14)
+    JWT_ACCESS_TOKEN_EXPIRES: datetime.timedelta = Field(..., env='ACCESS_TOKEN_TTL_IN_MINUTES')
+    JWT_REFRESH_TOKEN_EXPIRES: datetime.timedelta = Field(..., env='REFRESH_TOKEN_TTL_IN_DAYS')
+
+    @validator('JWT_ACCESS_TOKEN_EXPIRES', pre=True)
+    def set_datetime_unit_minutes(cls, val):
+        num_val = float(val)
+        return datetime.timedelta(minutes=num_val)
+
+    @validator('JWT_REFRESH_TOKEN_EXPIRES', pre=True)
+    def set_datetime_unit_days(cls, val):
+        return datetime.timedelta(days=float(val))
 
 
 app_config = AppConfig()
