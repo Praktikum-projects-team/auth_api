@@ -1,5 +1,4 @@
-from sqlalchemy.exc import NoResultFound
-from marshmallow import Schema, fields, ValidationError, pre_load
+from marshmallow import Schema, fields
 
 
 class LoginIn(Schema):
