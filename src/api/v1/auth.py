@@ -1,16 +1,18 @@
 from http import HTTPStatus
 
-from flask import jsonify
-from flask import request
-from flask import Blueprint
-
-
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
+from flask import jsonify, request, Blueprint
+from flask_jwt_extended import get_jwt_identity, get_jwt, jwt_required
 from marshmallow import ValidationError
 
 from api.v1.models.auth import sign_up_in, login_in, login_out
-from services.auth.auth_service import sign_up_user, login_user, UserAlreadyExists, UserIncorrectLoginData
+from services.auth.auth_service import (
+    sign_up_user,
+    login_user,
+    UserAlreadyExists,
+    UserIncorrectLoginData,
+    add_token_to_block_list
+)
+
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -52,10 +54,29 @@ def login():
     return login_out.dump(tokens)
 
 
-# @app.route("/protected", methods=["GET"])
+# @auth_bp.route('/check_token', methods=['POST'])
 # @jwt_required()
-# def protected():
-#     # Access the identity of the current user with get_jwt_identity
+# def check_token():
 #     current_user = get_jwt_identity()
 #     return jsonify(logged_in_as=current_user), 200
+
+
+@auth_bp.route('/logout', methods=['POST'])
+@jwt_required(verify_type=False)
+def logout():
+    token = get_jwt()
+    add_token_to_block_list(token['jti'])
+    return jsonify(msg=f'{token["type"].capitalize()} token successfully revoked')
+
+
+# @auth_bp.route('/refresh', methods=['POST'])
+# @
+# def refresh():
+#     user_agent = request.headers.get('User-Agent', default='unknown device')
+#     try:
+#         tokens = refresh_token()
+#     except UserIncorrectLoginData as err:
+#         return err, HTTPStatus.UNAUTHORIZED
+#
+#     return login_out.dump(tokens)
 

@@ -1,9 +1,12 @@
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, create_refresh_token
 
-from db.queries.user import does_user_exist, get_user_by_login, add_login_history_record
+from core.config import app_config
+from db.queries.user import get_user_by_login, add_login_history_record
 from db.queries.user import create_new_user
 from services.auth.passwords import hash_password, verify_password
+from services.auth.jwt_init import jwt
+from db.redis_storage import jwt_redis_blocklist
 
 
 class UserAlreadyExists(Exception):
@@ -12,6 +15,18 @@ class UserAlreadyExists(Exception):
 
 class UserIncorrectLoginData(Exception):
     ...
+
+
+# Callback function to check if a JWT exists in the redis blocklist
+@jwt.token_in_blocklist_loader
+def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
+    jti = jwt_payload["jti"]
+    token_in_redis = jwt_redis_blocklist.get(jti)
+    return token_in_redis is not None
+
+
+def add_token_to_block_list(jti):
+    jwt_redis_blocklist.set(jti, "", ex=app_config.JWT_ACCESS_TOKEN_EXPIRES)
 
 
 def sign_up_user(user):

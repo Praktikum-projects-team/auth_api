@@ -9,7 +9,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class RedisConfig(BaseSettings):
     host: str = Field(..., env='REDIS_HOST')
     port: int = Field(..., env='REDIS_PORT')
-    password: str = Field(..., env='REDIS_PASSWORD')
 
 
 class PostgresConfig(BaseSettings):
@@ -34,3 +33,6 @@ class AppConfig(BaseSettings):
     JWT_SECRET_KEY: str = Field(..., env='JWT_SECRET_KEY')
     JWT_ACCESS_TOKEN_EXPIRES: datetime.timedelta = datetime.timedelta(minutes=30)
     JWT_REFRESH_TOKEN_EXPIRES: datetime.timedelta = datetime.timedelta(days=14)
+
+
+app_config = AppConfig()
