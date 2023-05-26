@@ -1,11 +1,13 @@
 import argparse
+import logging
 import uuid
 from datetime import datetime
-import logging
 
 import psycopg2
 
 from core.config import PostgresConfig
+
+logging.basicConfig(level=logging.INFO)
 
 parser = argparse.ArgumentParser(description='Create superuser')
 parser.add_argument('login', type=str, help='Superuser login')
@@ -31,7 +33,7 @@ def createsuperuser(login, password):
         user_exist = cursor.fetchone()[0]
     if user_exist:
         logging.warning("Superuser already exist")
-        return "Superuser already exist"
+        return
 
     with conn.cursor() as cursor:
         created_at = datetime.utcnow()
@@ -44,8 +46,7 @@ def createsuperuser(login, password):
 
     conn.close()
 
-    logging.warning("Superuser successfully created")
-    return "Superuser successfully created"
+    logging.info("Superuser successfully created")
 
 
 if __name__ == '__main__':
