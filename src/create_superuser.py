@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 
+from services.auth.passwords import hash_password
+
 ABS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(ABS_DIR, '.env'))
 
@@ -33,6 +35,7 @@ conn = psycopg2.connect(
 
 def createsuperuser(login, password):
     user_id = str(uuid.uuid4())
+    hashed_password = hash_password(password)
 
     with conn.cursor() as cursor:
         cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE login = %s)", (login,))
@@ -46,7 +49,7 @@ def createsuperuser(login, password):
         cursor.execute(
             "INSERT INTO users (id, login, password, is_superuser, created_at)"
             "VALUES (%s, %s, %s, %s, %s)",
-            (user_id, login, password, True, created_at)  # TODO hash password after merging auth
+            (user_id, login, hashed_password, True, created_at)
         )
         conn.commit()
 
