@@ -1,8 +1,9 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, String, ForeignKey, DateTime
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
+
 from db.pg_db import db
 
 
@@ -27,12 +28,14 @@ class User(db.Model):
     password = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     name = Column(String, nullable=True)
+    is_superuser = Column(Boolean, default=False)
     roles = db.relationship(Role, secondary='user_roles')
 
-    def __init__(self, login, password, name=None):
+    def __init__(self, login, password, name=None, is_superuser=False):
         self.login = login
         self.password = password
         self.name = name
+        self.is_superuser = is_superuser
 
     def __repr__(self):
         return f'<User {self.login}>'
