@@ -2,6 +2,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 from core.config import PostgresConfig
+from dotenv import load_dotenv
+
+load_dotenv()
 
 db = SQLAlchemy()
 pg_conf = PostgresConfig()
