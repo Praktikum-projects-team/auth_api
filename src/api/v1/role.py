@@ -16,7 +16,7 @@ roles_bp = Blueprint("roles_bp", __name__)
 def roles_all():
     try:
         roles_db = Role.query.all()
-    except (AttributeError, DataError) as err:
+    except DataError as err:
         return {"message": str(err)}, HTTPStatus.BAD_REQUEST
 
     result = role_base_schema_all.dump(roles_db)
@@ -32,11 +32,7 @@ def role_create():
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
 
-    try:
-        role_exist = db.session.query(Role).filter(Role.name == body['name']).first()
-    except (ValueError, DataError) as err:
-        return {"message": str(err)}, HTTPStatus.BAD_REQUEST
-
+    role_exist = db.session.query(Role).filter(Role.name == body['name']).first()
     if role_exist:
         return {"message": "Role already exist"}, HTTPStatus.CONFLICT
 
@@ -78,11 +74,7 @@ def role_update(role_id: UUID):
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
 
-    try:
-        name_exist = db.session.query(Role).filter(Role.name == body['name']).first()
-    except (ValueError, DataError) as err:
-        return {"message": str(err)}, HTTPStatus.BAD_REQUEST
-
+    name_exist = db.session.query(Role).filter(Role.name == body['name']).first()
     if name_exist:
         return {"message": "Role with this name already exist"}, HTTPStatus.CONFLICT
 
