@@ -46,7 +46,7 @@ def createsuperuser(login, password):
         cursor.execute(
             "INSERT INTO users (id, login, password, is_superuser, created_at)"
             "VALUES (%s, %s, %s, %s, %s)",
-            (user_id, login, password, True, created_at)
+            (user_id, login, password, True, created_at)  # TODO hash password after merging auth
         )
         conn.commit()
 
