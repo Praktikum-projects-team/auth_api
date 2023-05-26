@@ -1,12 +1,5 @@
 import datetime
-import os
-
-from dotenv import load_dotenv
 from pydantic import BaseSettings, Field, PostgresDsn, validator
-
-load_dotenv()
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class RedisConfig(BaseSettings):

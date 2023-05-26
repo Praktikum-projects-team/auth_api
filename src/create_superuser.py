@@ -1,3 +1,9 @@
+import os
+from dotenv import load_dotenv
+
+ABS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(ABS_DIR, '.env'))
+
 import argparse
 import logging
 import uuid
