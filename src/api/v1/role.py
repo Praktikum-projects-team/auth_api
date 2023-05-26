@@ -14,11 +14,7 @@ roles_bp = Blueprint("roles_bp", __name__)
 
 @roles_bp.route("/", methods=["GET"])
 def roles_all():
-    try:
-        roles_db = Role.query.all()
-    except DataError as err:
-        return {"message": str(err)}, HTTPStatus.BAD_REQUEST
-
+    roles_db = Role.query.all()
     result = role_base_schema_all.dump(roles_db)
 
     return jsonify(result)
