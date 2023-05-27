@@ -1,12 +1,11 @@
 from flask import Flask
 
-from dotenv import load_dotenv
 
-from api.v1.users import users_bp
 from api.v1.auth import auth_bp
 from core.config import app_config
 from db.pg_db import init_db, db
 from services.auth.jwt_init import init_jwt
+from api.v1.users import users_bp
 
 app = Flask(__name__)
 app.config.from_object(app_config)
