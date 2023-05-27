@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+import pytest
+
 from tests.functional.testdata.role import get_role_data, get_role_id_by_name
 from tests.functional.utils.helpers import (
     make_delete_request,
@@ -111,3 +113,60 @@ class TestRole:
         resp = make_delete_request(f'{ROLES_URL}/{role_data["id"]}')
 
         assert resp.status == HTTPStatus.NOT_FOUND, 'Wrong status code'
+
+
+class TestRoleParams:
+
+    check_params_role_id_status_code = [
+        ('ddaa3878-0f37-4135-966f-49458b0e33bf', HTTPStatus.NOT_FOUND),
+        ('ddaa0000-0f37-4135-966f-49458b0e00bf', HTTPStatus.NOT_FOUND),
+        (-1, HTTPStatus.BAD_REQUEST),
+        (0, HTTPStatus.BAD_REQUEST),
+        (1, HTTPStatus.BAD_REQUEST),
+        (2.5, HTTPStatus.BAD_REQUEST),
+        ('uuid', HTTPStatus.BAD_REQUEST),
+        ('ddaa3878-0f37-4135-966f', HTTPStatus.BAD_REQUEST),
+        ('%#$*', HTTPStatus.BAD_REQUEST)
+    ]
+
+    check_params_name = [-1, 0, 1, 2.5]
+
+    @pytest.mark.parametrize('role_id, status_code', check_params_role_id_status_code)
+    def test_role_info_invalid_param(self, role_id, status_code):
+        """Checking info about role with invalid param"""
+        resp = make_get_request(f'{ROLES_URL}/{role_id}')
+
+        assert resp.status == status_code, 'Wrong status code'
+
+    @pytest.mark.parametrize('name', check_params_name)
+    def test_role_create_invalid_param(self, name):
+        """Checking create role with invalid param"""
+        resp = make_post_request(ROLES_URL, body={'name': name})
+
+        assert resp.status == HTTPStatus.BAD_REQUEST, 'Wrong status code'
+
+    @pytest.mark.parametrize('role_id, status_code', check_params_role_id_status_code)
+    def test_role_update_invalid_param_role_id(self, role_id, status_code):
+        """Checking update role with invalid param"""
+        role_data = get_role_data()
+        resp = make_put_request(f'{ROLES_URL}/{role_id}', body={'name': role_data['name']})
+
+        assert resp.status == status_code, 'Wrong status code'
+
+    @pytest.mark.parametrize('name', check_params_name)
+    def test_role_update_invalid_param_name(self, name):
+        """Checking update role with invalid param"""
+        role_data = get_role_data()
+        make_post_request(ROLES_URL, body={'name': role_data['name']})
+        role_id = get_role_id_by_name(make_get_request(ROLES_URL), role_data['name'])
+
+        resp = make_put_request(f'{ROLES_URL}/{role_id}', body={'name': name})
+
+        assert resp.status == HTTPStatus.BAD_REQUEST, 'Wrong status code'
+
+    @pytest.mark.parametrize('role_id, status_code', check_params_role_id_status_code)
+    def test_role_delete_invalid_param(self, role_id, status_code):
+        """Checking delete role with invalid param"""
+        resp = make_delete_request(f'{ROLES_URL}/{role_id}')
+
+        assert resp.status == status_code, 'Wrong status code'
