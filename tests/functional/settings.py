@@ -6,18 +6,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class TestSettings(BaseSettings):
-    host: str = Field(..., env='DB_HOST')
-    port: int = Field(..., env='DB_PORT')
-    user: str = Field(..., env='DB_USER')
-    password: str = Field(..., env='DB_PASSWORD')
-    database: str = Field(..., env='DB_NAME')
+    host_db: str = Field(..., env='DB_HOST')
+    port_db: int = Field(..., env='DB_PORT')
+    user_db: str = Field(..., env='DB_USER')
+    password_db: str = Field(..., env='DB_PASSWORD')
+    name_db: str = Field(..., env='DB_NAME')
+    # host_db_local: str = Field(..., env='DB_HOST_LOCAL')
 
-    api_host: str = Field(..., env='API_HOST')
-    api_port: int = Field(..., env='API_PORT')
+    host_api: str = Field(..., env='API_HOST')
+    port_api: int = Field(..., env='API_PORT')
 
     # Для локального запуска тестов
     class Config:
-        env_file = os.path.join(BASE_DIR, '.env.test')
+        env_file = os.path.join(BASE_DIR, './.env.test')
 
 
 test_settings = TestSettings()

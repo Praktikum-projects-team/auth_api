@@ -10,4 +10,4 @@ RUN pip install --upgrade pip && pip install -r /tests/functional/requirements.t
 
 COPY . .
 
-CMD python3 /tests/functional/utils/wait_for_pg.py && pytest /tests/functional/src
+CMD wait-for-it -s "${API_HOST}:${API_PORT}" --timeout 60 && pytest -s /tests/functional/src

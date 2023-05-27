@@ -32,22 +32,21 @@ class ApiResponse(BaseModel):
 
 def make_request(method: str, url: str, url_params: dict = None, body: dict = None) -> ApiResponse:
     resp = getattr(requests, method)(url, params=url_params, json=body)
-    resp.raise_for_status()
 
-    return ApiResponse(status=resp.status_code, body=await resp.json())
+    return ApiResponse(status=resp.status_code, body=resp.json())
 
 
 def make_get_request(url: str, url_params: dict = None):
-    make_request(method="get", url=url, url_params=url_params)
+    return make_request(method="get", url=url, url_params=url_params)
 
 
 def make_post_request(url: str, url_params: dict = None, body: dict = None):
-    make_request(method="post", url=url, url_params=url_params, body=body)
+    return make_request(method="post", url=url, url_params=url_params, body=body)
 
 
 def make_put_request(url: str, url_params: dict = None, body: dict = None):
-    make_request(method="put", url=url, url_params=url_params, body=body)
+    return make_request(method="put", url=url, url_params=url_params, body=body)
 
 
 def make_delete_request(url: str, url_params: dict = None):
-    make_request(method="delete", url=url, url_params=url_params)
+    return make_request(method="delete", url=url, url_params=url_params)

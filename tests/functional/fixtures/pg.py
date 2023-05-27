@@ -1,19 +1,19 @@
 import pytest
 import psycopg2
 
-from core.config import PostgresConfig
+from tests.functional.settings import TestSettings
 
-pg_conf = PostgresConfig()
+test_conf = TestSettings()
 
 
 @pytest.fixture(scope="session")
 def postgres_conn():
     conn = psycopg2.connect(
-        database=pg_conf.database,
-        user=pg_conf.user,
-        password=pg_conf.password,
-        host=pg_conf.host_local,
-        port=pg_conf.port
+        database=test_conf.name_db,
+        user=test_conf.user_db,
+        password=test_conf.password_db,
+        host=test_conf.host_db,
+        port=test_conf.port_db
     )
     yield conn
     conn.close()
