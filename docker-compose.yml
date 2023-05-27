@@ -17,14 +17,14 @@ services:
       timeout: 5s
       retries: 5
     restart: always
+    ports:
+      - "5432:5432"
 
   redis:
     container_name: redis
     image: redis:7
     env_file:
       - ./.env
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
       - $HOME/redis/data:/var/lib/redis/data
 
