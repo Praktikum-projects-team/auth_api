@@ -22,3 +22,4 @@ def add_login_history_record(user_id: UUID, user_agent: str):
     record = LoginHistory(user_id=user_id, user_agent=user_agent)
     db.session.add(record)
     db.session.commit()
+

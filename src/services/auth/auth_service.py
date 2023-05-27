@@ -17,6 +17,10 @@ class UserIncorrectLoginData(Exception):
     ...
 
 
+class UserIncorrectPassword(Exception):
+    ...
+
+
 # Callback function to check if a JWT exists in the redis blocklist
 @jwt.token_in_blocklist_loader
 def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
@@ -54,3 +58,12 @@ def login_user(login: str, password: str, user_agent: str):
     tokens = generate_token_pair(identity=user.login)
     add_login_history_record(user_id=user.id, user_agent=user_agent)
     return tokens
+
+
+def change_user_pw(login: str, password: str, new_password: str):
+    user = get_user_by_login(login)
+    if verify_password(password=password, hashed_password=user.password):
+        user.password = hash_password(new_password)
+        return user
+    else:
+        raise UserIncorrectPassword("Incorrect old password")
