@@ -16,9 +16,16 @@ class AdminUserInfoSchema(ma.Schema):
     created_at = fields.DateTime(required=True)
     name = fields.String(required=False, validate=validate.Length(min=1, max=50))
     is_superuser = fields.Boolean(required=True)
-    roles = fields.Nested(AdminRoleNameSchema, many=True)
+    roles = fields.Nested(AdminRoleNameSchema, required=True, many=True)
+
+
+class AdminUserUpdateSchema(ma.Schema):
+    is_superuser = fields.Boolean(required=True)
+    # roles = fields.Nested(AdminRoleNameSchema, required=True, many=True)
+    roles = fields.List(fields.String(), required=True, many=True)
 
 
 admin_user_base_schema = AdminUserBaseSchema()
 admin_user_all_schema = AdminUserInfoSchema(many=True)
 admin_user_info_schema = AdminUserInfoSchema()
+admin_user_update_schema = AdminUserUpdateSchema()
