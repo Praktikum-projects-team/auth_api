@@ -83,8 +83,8 @@ def role_update(role_id: UUID):
 def role_delete(role_id: UUID):
     try:
         role = Role.query.filter_by(id=role_id).first()
-    except ValidationError as err:
-        return err.messages, HTTPStatus.BAD_REQUEST
+    except (ValueError, DataError) as err:
+        return {"message": str(err)}, HTTPStatus.BAD_REQUEST
 
     if not role:
         return {"message": "Role not found"}, HTTPStatus.NOT_FOUND
