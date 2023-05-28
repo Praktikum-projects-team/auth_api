@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import DataError
 
-from api.v1.models.admin_roles import admin_role_base_schema, admin_role_base_schema_all, admin_role_name_schema
+from api.v1.models.admin_roles import admin_role_base_schema, admin_role_all_schema, admin_role_name_schema
 from db.models import Role
 from db.pg_db import db
 
@@ -15,7 +15,7 @@ admin_roles_bp = Blueprint("admin_roles_bp", __name__)
 @admin_roles_bp.route("/", methods=["GET"])
 def roles_all():
     roles_db = Role.query.all()
-    result = admin_role_base_schema_all.dump(roles_db)
+    result = admin_role_all_schema.dump(roles_db)
 
     return jsonify(result)
 

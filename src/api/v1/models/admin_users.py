@@ -20,5 +20,5 @@ class AdminUserInfoSchema(ma.Schema):
 
 
 admin_user_base_schema = AdminUserBaseSchema()
+admin_user_all_schema = AdminUserInfoSchema(many=True)
 admin_user_info_schema = AdminUserInfoSchema()
-admin_user_info_schema_all = AdminUserInfoSchema(many=True)

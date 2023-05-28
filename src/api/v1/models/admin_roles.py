@@ -14,5 +14,5 @@ class AdminRoleNameSchema(ma.Schema):
 
 
 admin_role_base_schema = AdminRoleBaseSchema()
-admin_role_base_schema_all = AdminRoleBaseSchema(many=True)
+admin_role_all_schema = AdminRoleBaseSchema(many=True)
 admin_role_name_schema = AdminRoleNameSchema()
