@@ -1,9 +1,5 @@
-import os
 import datetime
-
 from pydantic import BaseSettings, Field, PostgresDsn, validator
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class RedisConfig(BaseSettings):
@@ -17,6 +13,7 @@ class PostgresConfig(BaseSettings):
     user: str = Field(..., env='DB_USER')
     password: str = Field(..., env='DB_PASSWORD')
     database: str = Field(..., env='DB_NAME')
+    host_local: str = Field(..., env='DB_HOST_LOCAL')
 
 
 pg_conf = PostgresConfig()
