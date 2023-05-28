@@ -6,6 +6,9 @@ import requests
 from psycopg2 import DataError
 from pydantic import BaseModel
 
+from tests.functional.testdata.user import get_user_data
+from tests.functional.utils.routes import AUTH_URL, ROLES_URL
+
 
 def insert_data(postgres_conn, table_name, data):
     cursor = postgres_conn.cursor()
@@ -50,3 +53,20 @@ def make_put_request(url: str, url_params: dict = None, body: dict = None):
 
 def make_delete_request(url: str, url_params: dict = None):
     return make_request(method="delete", url=url, url_params=url_params)
+
+
+def create_user():
+    user_data = get_user_data()
+    make_post_request(AUTH_URL, body={
+        'login': user_data['login'],
+        'name': user_data['name'],
+        'password': user_data['password']
+    })
+
+    return user_data
+
+
+def create_role(role_name: str):
+    role_exists = make_get_request(ROLES_URL)
+    if role_name not in role_exists.body:
+        make_post_request(ROLES_URL, body={'name': role_name})
