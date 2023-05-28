@@ -8,7 +8,7 @@ from db.pg_db import db
 
 
 class Role(db.Model):
-    __tablename__ = 'roles_bp'
+    __tablename__ = 'roles'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column(String, nullable=False, unique=True)

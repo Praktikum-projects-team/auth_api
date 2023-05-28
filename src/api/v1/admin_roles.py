@@ -5,26 +5,26 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import DataError
 
-from api.v1.models.role import role_base_schema, role_base_schema_all, role_name_schema
+from api.v1.models.admin_roles import admin_role_base_schema, admin_role_base_schema_all, admin_role_name_schema
 from db.models import Role
 from db.pg_db import db
 
-roles_bp = Blueprint("roles_bp", __name__)
+admin_roles_bp = Blueprint("admin_roles_bp", __name__)
 
 
-@roles_bp.route("/", methods=["GET"])
+@admin_roles_bp.route("/", methods=["GET"])
 def roles_all():
     roles_db = Role.query.all()
-    result = role_base_schema_all.dump(roles_db)
+    result = admin_role_base_schema_all.dump(roles_db)
 
     return jsonify(result)
 
 
-@roles_bp.route('/', methods=['POST'])
+@admin_roles_bp.route('/', methods=['POST'])
 def role_create():
     role_data = request.get_json()
     try:
-        body = role_name_schema.load(role_data)
+        body = admin_role_name_schema.load(role_data)
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
 
@@ -39,7 +39,7 @@ def role_create():
     return {"message": "Role created successfully"}, HTTPStatus.CREATED
 
 
-@roles_bp.route("/<role_id>", methods=["GET"])
+@admin_roles_bp.route("/<role_id>", methods=["GET"])
 def role_info(role_id: UUID):
     try:
         role = Role.query.filter_by(id=role_id).first()
@@ -49,12 +49,12 @@ def role_info(role_id: UUID):
     if not role:
         return {"message": "Role not found"}, HTTPStatus.NOT_FOUND
 
-    result = role_base_schema.dump(role)
+    result = admin_role_base_schema.dump(role)
 
     return jsonify(result)
 
 
-@roles_bp.route("/<role_id>", methods=["PUT"])
+@admin_roles_bp.route("/<role_id>", methods=["PUT"])
 def role_update(role_id: UUID):
     role_data = request.get_json()
     try:
@@ -66,7 +66,7 @@ def role_update(role_id: UUID):
         return {"message": "Role not found"}, HTTPStatus.NOT_FOUND
 
     try:
-        body = role_name_schema.load(role_data)
+        body = admin_role_name_schema.load(role_data)
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
 
@@ -79,7 +79,7 @@ def role_update(role_id: UUID):
     return {"message": "Role updated successfully"}, HTTPStatus.CREATED
 
 
-@roles_bp.route("/<role_id>", methods=["DELETE"])
+@admin_roles_bp.route("/<role_id>", methods=["DELETE"])
 def role_delete(role_id: UUID):
     try:
         role = Role.query.filter_by(id=role_id).first()
