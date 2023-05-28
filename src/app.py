@@ -3,6 +3,7 @@ from flask import Flask
 from api.v1.models.marshmallow_init import init_marshmallow
 from api.v1.role import roles_bp
 from api.v1.auth import auth_bp
+from api.v1.user import users_bp
 from core.config import app_config
 from db.pg_db import init_db, db
 from services.auth.jwt_init import init_jwt
@@ -12,6 +13,7 @@ def register_blueprints(app):
     API_V1_PATH = '/api/v1'
     app.register_blueprint(auth_bp, url_prefix=API_V1_PATH + '/auth')
     app.register_blueprint(roles_bp, url_prefix=API_V1_PATH + "/admin/roles")
+    app.register_blueprint(users_bp, url_prefix=API_V1_PATH + '/user')
 
 
 def init_extensions(app):
