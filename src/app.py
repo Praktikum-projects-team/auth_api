@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_migrate import upgrade
 
 from api.v1.admin_roles import admin_roles_bp
 from api.v1.admin_users import admin_users_bp
@@ -31,6 +32,8 @@ def create_app():
     app.config.from_object(app_config)
     init_extensions(app)
     register_blueprints(app)
+    with app.app_context():
+        upgrade()
     return app
 
 
