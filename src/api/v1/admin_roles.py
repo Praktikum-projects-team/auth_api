@@ -9,7 +9,7 @@ from api.v1.models.admin_roles import admin_role_base_schema, admin_role_all_sch
 from db.models import Role
 from db.pg_db import db
 
-admin_roles_bp = Blueprint("admin_roles_bp", __name__)
+admin_roles_bp = Blueprint("admin_roles", __name__)
 
 
 @admin_roles_bp.route("/", methods=["GET"])

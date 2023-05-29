@@ -31,11 +31,12 @@ class User(db.Model):
     is_superuser = Column(Boolean, default=False)
     roles = db.relationship(Role, secondary='user_roles')
 
-    def __init__(self, login, password, name=None, is_superuser=False):
+    def __init__(self, login, password, name=None, is_superuser=False, roles=None):
         self.login = login
         self.password = password
         self.name = name
         self.is_superuser = is_superuser
+        self.roles = roles
 
     def __repr__(self):
         return f'<User {self.login}>'
