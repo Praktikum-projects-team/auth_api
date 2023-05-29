@@ -4,6 +4,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token
 from core.config import app_config
 from db.queries.user import get_user_by_login, add_login_history_record
 from db.queries.user import create_new_user
+from db.pg_db import db
 from services.auth.passwords import hash_password, verify_password
 from services.auth.jwt_init import jwt
 from db.redis_storage import jwt_redis_blocklist
@@ -14,6 +15,10 @@ class UserAlreadyExists(Exception):
 
 
 class UserIncorrectLoginData(Exception):
+    ...
+
+
+class UserIncorrectPassword(Exception):
     ...
 
 
@@ -54,3 +59,12 @@ def login_user(login: str, password: str, user_agent: str):
     tokens = generate_token_pair(identity=user.login)
     add_login_history_record(user_id=user.id, user_agent=user_agent)
     return tokens
+
+
+def change_user_pw(login: str, password: str, new_password: str):
+    user = get_user_by_login(login)
+    if verify_password(password=password, hashed_password=user.password):
+        user.password = hash_password(new_password)
+        db.session.commit()
+    else:
+        raise UserIncorrectPassword("Incorrect old password")

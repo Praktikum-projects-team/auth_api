@@ -5,81 +5,87 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy.exc import DataError
 
-from api.v1.models.role import role_base_schema, role_base_schema_all, role_name_schema
+from api.v1.models.admin_roles import admin_role_base_schema, admin_role_all_schema, admin_role_name_schema
 from db.models import Role
 from db.pg_db import db
+from services.auth.role_checker import admin_required
 
-roles_bp = Blueprint("roles_bp", __name__)
+admin_roles_bp = Blueprint('admin_roles', __name__)
 
 
-@roles_bp.route("/", methods=["GET"])
+@admin_roles_bp.route('/', methods=['GET'])
+@admin_required
 def roles_all():
     roles_db = Role.query.all()
-    result = role_base_schema_all.dump(roles_db)
+    result = admin_role_all_schema.dump(roles_db)
 
     return jsonify(result)
 
 
-@roles_bp.route('/', methods=['POST'])
+@admin_roles_bp.route('/', methods=['POST'])
+@admin_required
 def role_create():
     role_data = request.get_json()
     try:
-        body = role_name_schema.load(role_data)
+        body = admin_role_name_schema.load(role_data)
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
 
     role_exist = db.session.query(Role).filter(Role.name == body['name']).first()
     if role_exist:
-        return {"message": "Role already exist"}, HTTPStatus.CONFLICT
+        return {'message': 'Role already exist'}, HTTPStatus.CONFLICT
 
     new_role = Role(name=body['name'])
     db.session.add(new_role)
     db.session.commit()
 
-    return {"message": "Role created successfully"}, HTTPStatus.CREATED
+    return {'message': 'Role created successfully'}, HTTPStatus.CREATED
 
 
-@roles_bp.route("/<role_id>", methods=["GET"])
+@admin_roles_bp.route('/<role_id>', methods=['GET'])
+@admin_required
 def role_info(role_id: UUID):
     try:
         role = Role.query.filter_by(id=role_id).first()
     except (ValueError, DataError) as err:
-        return {"message": str(err)}, HTTPStatus.BAD_REQUEST
+        return {'message': str(err)}, HTTPStatus.BAD_REQUEST
 
     if not role:
-        return {"message": "Role not found"}, HTTPStatus.NOT_FOUND
+        return {'message': 'Role not found'}, HTTPStatus.NOT_FOUND
 
-    result = role_base_schema.dump(role)
+    result = admin_role_base_schema.dump(role)
 
     return jsonify(result)
 
 
-@roles_bp.route("/<role_id>", methods=["PUT"])
+@admin_roles_bp.route('/<role_id>', methods=['PUT'])
+@admin_required
 def role_update(role_id: UUID):
     role_data = request.get_json()
     try:
         role = Role.query.filter_by(id=role_id).first()
     except (ValueError, DataError) as err:
-        return {"message": str(err)}, HTTPStatus.BAD_REQUEST
+        return {'message': str(err)}, HTTPStatus.BAD_REQUEST
 
     if not role:
-        return {"message": "Role not found"}, HTTPStatus.NOT_FOUND
+        return {'message': 'Role not found'}, HTTPStatus.NOT_FOUND
 
     try:
-        body = role_name_schema.load(role_data)
+        body = admin_role_name_schema.load(role_data)
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
 
     name_exist = db.session.query(Role).filter(Role.name == body['name']).first()
     if name_exist:
-        return {"message": "Role with this name already exist"}, HTTPStatus.CONFLICT
+        return {'message': 'Role with this name already exist'}, HTTPStatus.CONFLICT
 
     role.name = body['name']
     db.session.commit()
-    return {"message": "Role updated successfully"}, HTTPStatus.CREATED
+    return {'message': 'Role updated successfully'}, HTTPStatus.CREATED
 
 
-@roles_bp.route("/<role_id>", methods=["DELETE"])
+@admin_roles_bp.route('/<role_id>', methods=['DELETE'])
+@admin_required
 def role_delete(role_id: UUID):
     try:
         role = Role.query.filter_by(id=role_id).first()
@@ -87,9 +93,9 @@ def role_delete(role_id: UUID):
         return {"message": str(err)}, HTTPStatus.BAD_REQUEST
 
     if not role:
-        return {"message": "Role not found"}, HTTPStatus.NOT_FOUND
+        return {'message': 'Role not found'}, HTTPStatus.NOT_FOUND
 
     db.session.query(Role).filter_by(id=role.id).delete()
     db.session.commit()
 
-    return {"message": "Role deleted successfully"}, HTTPStatus.OK
+    return {'message': 'Role deleted successfully'}, HTTPStatus.OK
