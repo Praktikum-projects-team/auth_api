@@ -7,3 +7,4 @@ AUTH_URL = f'{BASE_URL}/auth'
 ROLES_URL = f'{BASE_URL}/admin/roles'
 
 AUTH_URL_LOGIN = f'{AUTH_URL}/login'
+AUTH_URL_SIGN_UP = f'{AUTH_URL}/sign_up'

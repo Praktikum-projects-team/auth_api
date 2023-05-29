@@ -1,15 +1,14 @@
-from flask import Blueprint, request, jsonify
-from pydantic import UUID4
-from db.models import User, LoginHistory
-from db.pg_db import db
-from db.queries import user
-from api.v1.models.users import user_schema, user_change_data, change_login, change_password, login_history
-import logging
-from sqlalchemy.exc import DataError
 from http import HTTPStatus
+
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
-from services.auth.auth_service import change_user_pw, UserIncorrectPassword
+
+from api.v1.models.users import change_login, change_password, login_history, user_change_data, user_schema
+from db.models import LoginHistory, User
+from db.pg_db import db
+from db.queries import user
+from services.auth.auth_service import UserIncorrectPassword, change_user_pw
 
 users_bp = Blueprint("user", __name__)
 

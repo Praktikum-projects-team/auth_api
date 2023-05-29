@@ -3,9 +3,8 @@ from http import HTTPStatus
 import pytest
 
 from tests.functional.testdata.role import get_role_data, get_role_id_by_name
-from tests.functional.utils.constants import AdminData
 from tests.functional.utils.helpers import (
-    get_access_token, make_delete_request,
+    make_delete_request,
     make_get_request,
     make_post_request,
     make_put_request

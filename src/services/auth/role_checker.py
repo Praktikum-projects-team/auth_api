@@ -2,9 +2,8 @@ import functools
 from http import HTTPStatus
 
 from flask import jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
+from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 
-from constants import RoleName
 from db.queries.user import get_user_by_login
 
 

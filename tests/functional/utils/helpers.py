@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from tests.functional.testdata.user import get_user_data
 from tests.functional.utils.constants import AdminData
-from tests.functional.utils.routes import AUTH_URL, AUTH_URL_LOGIN, ROLES_URL
+from tests.functional.utils.routes import ADMIN_USER_URL, AUTH_URL_LOGIN, AUTH_URL_SIGN_UP, ROLES_URL
 
 
 def insert_data(pg_conn, table_name, data):
@@ -72,9 +72,16 @@ def make_delete_request(url: str, url_params: dict = None):
     return make_request(method="delete", url=url, url_params=url_params)
 
 
+def get_user_id_by_login(login: str) -> int:
+    users = make_get_request(ADMIN_USER_URL)
+    for user in users.body:
+        if user['login'] == login:
+            return user['id']
+
+
 def create_user():
     user_data = get_user_data()
-    make_post_request(AUTH_URL, body={
+    make_post_request(AUTH_URL_SIGN_UP, body={
         'login': user_data['login'],
         'name': user_data['name'],
         'password': user_data['password']
@@ -84,6 +91,6 @@ def create_user():
 
 
 def create_role(role_name: str):
-    role_exists = make_get_request(ROLES_URL)
-    if role_name not in role_exists.body:
+    role = make_get_request(ROLES_URL)
+    if role_name not in role.body:
         make_post_request(ROLES_URL, body={'name': role_name})

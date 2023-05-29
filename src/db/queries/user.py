@@ -1,7 +1,5 @@
 from uuid import UUID
 
-from psycopg2 import DataError
-
 from constants import RoleName
 from db.models import Role, User, LoginHistory
 from db.pg_db import db
