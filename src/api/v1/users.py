@@ -3,7 +3,7 @@ from pydantic import UUID4
 from db.models import User, LoginHistory
 from db.pg_db import db
 from db.queries import user
-from api.v1.models.user import user_schema, user_change_data, change_login, change_password, login_history
+from api.v1.models.users import user_schema, user_change_data, change_login, change_password, login_history
 import logging
 from sqlalchemy.exc import DataError
 from http import HTTPStatus

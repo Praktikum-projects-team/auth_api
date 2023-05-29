@@ -3,7 +3,7 @@ from flask import Flask
 from api.v1.models.marshmallow_init import init_marshmallow
 from api.v1.role import roles_bp
 from api.v1.auth import auth_bp
-from api.v1.user import users_bp
+from api.v1.users import users_bp
 from core.config import app_config
 from db.pg_db import init_db, db
 from services.auth.jwt_init import init_jwt
