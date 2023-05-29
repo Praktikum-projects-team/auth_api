@@ -8,7 +8,7 @@ from db.pg_db import db
 
 
 class Role(db.Model):
-    __tablename__ = 'roles_bp'
+    __tablename__ = 'roles'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column(String, nullable=False, unique=True)
@@ -31,11 +31,12 @@ class User(db.Model):
     is_superuser = Column(Boolean, default=False)
     roles = db.relationship(Role, secondary='user_roles')
 
-    def __init__(self, login, password, name=None, is_superuser=False):
+    def __init__(self, login, password, name=None, is_superuser=False, roles=None):
         self.login = login
         self.password = password
         self.name = name
         self.is_superuser = is_superuser
+        self.roles = roles or []
 
     def __repr__(self):
         return f'<User {self.login}>'

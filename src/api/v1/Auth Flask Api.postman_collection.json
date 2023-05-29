@@ -1,0 +1,403 @@
+{
+	"info": {
+		"_postman_id": "3ce62a9b-e509-4148-b546-2b7a3edaa9dd",
+		"name": "Auth Flask Api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5319546"
+	},
+	"item": [
+		{
+			"name": "hello world",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1/api/hello-world",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"path": [
+						"api",
+						"hello-world"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth - регистрация",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"user4@user.ru\",\n    \"password\": \"123qwe\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/auth/sign_up",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"auth",
+						"sign_up"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth - вход",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var response = pm.response.json();",
+							"access_token = response['access_token']",
+							"pm.environment.set(\"access_token\", access_token);",
+							"",
+							"refresh_token = response['refresh_token']",
+							"pm.environment.set(\"refresh_token\", refresh_token);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"user@user.ru\",\n    \"password\": \"123qwe\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/auth/login",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth - выход",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/auth/logout",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth - проверить токен",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/auth/check_access_token",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"auth",
+						"check_access_token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth - обновить токен",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{refresh_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/auth/refresh",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"auth",
+						"refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin role - список ролей",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/admin/roles",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"admin",
+						"roles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin role - одна роль",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/admin/roles/1064b9ec-9717-4f49-a65f-4ae7f76327e2",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"admin",
+						"roles",
+						"1064b9ec-9717-4f49-a65f-4ae7f76327e2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin role - добавить роль",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"User\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/admin/roles/",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"admin",
+						"roles",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin role - изменить роль",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"user_2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/admin/roles/ddaa3878-0f37-4135-966f-49458b0e33ba",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"admin",
+						"roles",
+						"ddaa3878-0f37-4135-966f-49458b0e33ba"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin role - удалить роль",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"sub\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/admin/roles/ddaa3878-0f37-4135-966f-49458b0e33bf",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"admin",
+						"roles",
+						"ddaa3878-0f37-4135-966f-49458b0e33bf"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin user - список юзеров",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/admin/users",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"admin",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin user - один юзер",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/admin/users/da22b67d-2243-4dbb-894e-48c98a83eb42",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"admin",
+						"users",
+						"da22b67d-2243-4dbb-894e-48c98a83eb42"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin user - изменить юзера",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"user_2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/admin/users/148a8ec2-1e6a-44dc-8aae-9bb427279068",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"admin",
+						"users",
+						"148a8ec2-1e6a-44dc-8aae-9bb427279068"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

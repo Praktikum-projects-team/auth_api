@@ -1,0 +1,48 @@
+version: '3'
+services:
+  postgres:
+    container_name: postgres
+    image: "postgres:13"
+    env_file:
+      - ./.env.test
+    environment:
+      POSTGRES_DB: auth_database
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: 123qwe
+    volumes:
+      - $HOME/postgresql/data:/var/lib/postgresql/auth_api_data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U app -d auth_database" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+    ports:
+      - "5432:5432"
+
+  redis:
+    container_name: redis
+    image: redis:7
+    env_file:
+      - ./.env.test
+    volumes:
+      - $HOME/redis/data:/var/lib/redis/data
+
+  auth:
+    container_name: auth
+    build: ..
+    env_file:
+      - ./.env.test
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+
+  tests:
+    container_name: tests
+    build: .
+    env_file:
+      - ./.env.test
+    depends_on:
+      - auth
