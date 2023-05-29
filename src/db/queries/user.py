@@ -14,14 +14,8 @@ def does_user_exist(login: str):
 
 
 def create_new_user(user):
-    # Создаем роль, если она не существует
     role = db.session.query(Role).filter(Role.name == RoleName.USER).first()
-    if not role:
-        new_role = Role(name=RoleName.USER)
-        db.session.add(new_role)
-        db.session.commit()
 
-    # Вносим пользователя в базу
     new_user = User(**user, roles=[role])
     db.session.add(new_user)
     db.session.commit()
