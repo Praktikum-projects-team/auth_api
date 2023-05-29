@@ -3,7 +3,7 @@ from pydantic import UUID4
 from db.models import User, LoginHistory
 from db.pg_db import db
 from db.queries import user
-from api.v1.models.users import user_schema, user_change_data, change_login, change_password, login_history
+from api.v1.models.user import user_schema, user_change_data, change_login, change_password, login_history
 import logging
 from sqlalchemy.exc import DataError
 from http import HTTPStatus
@@ -14,17 +14,13 @@ from services.auth.auth_service import change_user_pw, UserIncorrectPassword
 users_bp = Blueprint("user", __name__)
 
 
-@users_bp.route('/profile/<user_id>', methods=['GET'])
+@users_bp.route('/profile', methods=['GET'])
 @jwt_required()
-def get_user_info(user_id: UUID4):
-    try:
-        user = User.query.filter_by(id=user_id).first()
-    except (ValueError, DataError) as err:
-        return {"message": str(err)}, HTTPStatus.BAD_REQUEST
-    if not user:
-        return {"message": "User not found"}, HTTPStatus.NOT_FOUND
+def get_user_info():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(login=current_user).first()
     result = user_schema.dump(user)
-    return jsonify(result)
+    return jsonify(result), HTTPStatus.OK
 
 
 @users_bp.route('/profile', methods=['PUT'])
@@ -37,23 +33,19 @@ def update_user_info():
         body = user_change_data.load(user_new_data)
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
-    if body['name']:
-        user.name = body['name']
+    user.name = body['name']
     db.session.commit()
     return {"message": "User updated successfully"}, HTTPStatus.CREATED
 
 
-@users_bp.route('/profile/login_history/<user_id>', methods=['GET'])
+@users_bp.route('/profile/login_history', methods=['GET'])
 @jwt_required()
-def get_login_history(user_id: UUID4):
-    try:
-        user_login_history = LoginHistory.query.filter_by(user_id=user_id).all()
-    except (ValueError, DataError) as err:
-        return {"message": str(err)}, HTTPStatus.BAD_REQUEST
-    if not user_login_history:
-        return {"message": "Login history not found"}, HTTPStatus.NOT_FOUND
+def get_login_history():
+    current_user = get_jwt_identity()
+    user_id = User.query.filter_by(login=current_user).first().id
+    user_login_history = LoginHistory.query.filter_by(user_id=user_id).all()
     result = login_history.dump(user_login_history)
-    return jsonify(result)
+    return jsonify(result), HTTPStatus.OK
 
 
 @users_bp.route('/profile/change_login', methods=['PUT'])
@@ -69,8 +61,7 @@ def change_user_login():
     login_exist = user.does_user_exist(body['new_login'])
     if login_exist:
         return {"message": "Login already exist"}, HTTPStatus.CONFLICT
-    elif body['new_login']:
-        user_data.login = body['new_login']
+    user_data.login = body['new_login']
     db.session.commit()
     return {"message": "User login updated successfully"}, HTTPStatus.CREATED
 
@@ -84,12 +75,8 @@ def change_user_password():
         body = change_password.load(user_password_data)
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
-    if body['new_password']:
-        try:
-            user_data = change_user_pw(current_user, body['old_password'], body['new_password'])
-        except UserIncorrectPassword as err:
-            return jsonify(message=str(err)), HTTPStatus.CONFLICT
-        db.session.commit()
-        return {"message": "User password updated successfully"}, HTTPStatus.CREATED
-    else:
-        return {"message": "User password must not be empty"}, HTTPStatus.CONFLICT
+    try:
+        change_user_pw(current_user, body['old_password'], body['new_password'])
+    except UserIncorrectPassword as err:
+        return jsonify(message=str(err)), HTTPStatus.CONFLICT
+    return {"message": "User password updated successfully"}, HTTPStatus.CREATED
