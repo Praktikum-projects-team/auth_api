@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 
+from constants import RoleName
 from services.auth.passwords import hash_password
 
 ABS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,17 +40,50 @@ def createsuperuser(login, password):
 
     with conn.cursor() as cursor:
         cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE login = %s)", (login,))
-        user_exist = cursor.fetchone()[0]
-    if user_exist:
+        user = cursor.fetchone()[0]
+    if user:
         logging.warning("Superuser already exist")
         return
 
+    # Создаем суперпользователя, если он не был создан
     with conn.cursor() as cursor:
         created_at = datetime.utcnow()
         cursor.execute(
             "INSERT INTO users (id, login, password, is_superuser, created_at)"
             "VALUES (%s, %s, %s, %s, %s)",
             (user_id, login, hashed_password, True, created_at)
+        )
+        conn.commit()
+
+    # Создаем роль администратора, если она не была создана
+    with conn.cursor() as cursor:
+        cursor.execute(
+            "SELECT * FROM roles WHERE name = %s", (RoleName.ADMIN,)
+        )
+        role = cursor.fetchone()
+    if not role:
+        role_id = str(uuid.uuid4())
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO roles (id, name)"
+                "VALUES (%s, %s)",
+                (role_id, RoleName.ADMIN,)
+            )
+            conn.commit()
+    else:
+        # Получаем id созданной роли администратора
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT id FROM roles WHERE name = %s", (RoleName.ADMIN,)
+            )
+            role_id = cursor.fetchone()
+
+    # Привязываем роль администратора к суперпользователю
+    with conn.cursor() as cursor:
+        cursor.execute(
+            "INSERT INTO user_roles (user_id, role_id, given_at)"
+            "VALUES (%s, %s, %s)",
+            (user_id, role_id, datetime.utcnow())
         )
         conn.commit()
 

@@ -10,7 +10,7 @@ from tests.functional.utils.routes import ADMIN_USER_URL
 
 class TestAdminUsers:
 
-    def test_users_all(self):
+    def test_admin_userss_all(self):
         """Checking to get a list of users"""
         for _ in range(3):
             create_user()
@@ -21,7 +21,7 @@ class TestAdminUsers:
         for field in expected_fields:
             assert field in resp.body[0], f'No {field} in resp'
 
-    def test_user_info(self):
+    def test_admin_users_info(self):
         """Checking info about user"""
         user_data = create_user()
         resp = make_get_request(f'{ADMIN_USER_URL}/{user_data["id"]}')
@@ -34,7 +34,7 @@ class TestAdminUsers:
         assert resp.body['is_superuser'] == user_data['is_superuser'], 'Wrong is_superuser'
         assert resp.body['roles'] == [RoleName.USER], 'Wrong roles'
 
-    def test_user_info_not_found(self):
+    def test_admin_users_info_not_found(self):
         """Checking info about user that does not exist"""
         user_data = get_user_data()
         resp = make_get_request(f'{ADMIN_USER_URL}/{user_data["id"]}')
@@ -48,7 +48,7 @@ class TestAdminUsers:
         (['123'], False),
         (['*^%$'], True)
     ])
-    def test_user_update(self, roles_name, is_superuser):
+    def test_admin_users_update(self, roles_name, is_superuser):
         """Checking update user"""
         user_data = create_user()
 
@@ -69,7 +69,7 @@ class TestAdminUsers:
         assert resp_after_update.body['is_superuser'] == is_superuser, 'Wrong is_superuser'
         assert resp_after_update.body['roles'] == roles_name, 'Wrong roles'
 
-    def test_user_update_not_found(self):
+    def test_admin_users_update_not_found(self):
         """Checking update user not found"""
         user_data = get_user_data()
 
@@ -82,7 +82,7 @@ class TestAdminUsers:
         assert resp.body['message'] == 'User not found', 'Wrong message'
 
     @pytest.mark.parametrize('roles_name', [['role_name_not_exist'], ['123'], ['*^%$']])
-    def test_user_update_not_exist_role(self, roles_name):
+    def test_admin_users_update_not_exist_role(self, roles_name):
         """Checking update user on role not exist"""
         user_data = create_user()
 

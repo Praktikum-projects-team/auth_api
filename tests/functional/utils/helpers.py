@@ -7,25 +7,41 @@ from psycopg2 import DataError
 from pydantic import BaseModel
 
 from tests.functional.testdata.user import get_user_data
-from tests.functional.utils.routes import AUTH_URL, ROLES_URL
+from tests.functional.utils.constants import AdminData
+from tests.functional.utils.routes import AUTH_URL, AUTH_URL_LOGIN, ROLES_URL
 
 
-def insert_data(postgres_conn, table_name, data):
-    cursor = postgres_conn.cursor()
+def insert_data(pg_conn, table_name, data):
+    cursor = pg_conn.cursor()
     columns = ', '.join(data.keys())
     values = ', '.join(['%s'] * len(data))
     query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
 
     try:
         cursor.execute(query, tuple(data.values()))
-        postgres_conn.commit()
+        pg_conn.commit()
         logging.info(f"Success to insert data into {table_name}")
     except DataError as e:
-        postgres_conn.rollback()
+        pg_conn.rollback()
         logging.error(f"Failed to insert data into {table_name}")
         raise e
     finally:
         cursor.close()
+
+
+def get_access_token(login: str, password: str) -> str:
+    resp = requests.post(AUTH_URL_LOGIN, json={
+        'login': login,
+        'password': password
+    })
+    resp_data = resp.json()
+    if resp.status_code != HTTPStatus.OK:
+        raise Exception(resp_data['message'])
+
+    return resp_data['access_token']
+
+
+ADMIN_ACCESS_TOKEN = get_access_token(AdminData.LOGIN, AdminData.PASSWORD)
 
 
 class ApiResponse(BaseModel):
@@ -34,7 +50,8 @@ class ApiResponse(BaseModel):
 
 
 def make_request(method: str, url: str, url_params: dict = None, body: dict = None) -> ApiResponse:
-    resp = getattr(requests, method)(url, params=url_params, json=body)
+    headers = {'Authorization': f'Bearer {ADMIN_ACCESS_TOKEN}'}
+    resp = getattr(requests, method)(url, params=url_params, json=body, headers=headers)
 
     return ApiResponse(status=resp.status_code, body=resp.json())
 

@@ -17,7 +17,7 @@ def role_required(role):
             user = get_user_by_login(user_login)
             role_names = [r.name for r in user.roles]
             if role not in role_names:
-                return jsonify(message=f'user must have role {role}'), HTTPStatus.FORBIDDEN
+                return jsonify(message=f'User must have role {role}'), HTTPStatus.FORBIDDEN
             result = func(*args, **kwargs)
             return result
         return wrapper
