@@ -21,13 +21,13 @@
 * Создание суперпользователя: `python src/create_superuser.py [superuser_login] [superuser_password]`
 
 ## Структура проекта
-* src/api/ - код сервиса
-  * v1 - эндпоинты сервиса
-    * v1/models - модели для эндпоинтов
-    * v1/Api.postman_collection.json - коллекция запросов для postman
-  * core - конфигурация сервиса
-  * db - работа с базами данных postgres и redis
-  * services - методы для эндпоинтов
+* src - код сервиса
+  * api/v1 - эндпоинты сервиса
+      * v1/models - модели для эндпоинтов
+      * v1/Api.postman_collection.json - коллекция запросов для postman
+    * core - конфигурация сервиса
+    * db - работа с базами данных postgres и redis
+    * services - слой логики для эндпоинтов
 * tests/functional/ - код тестов для эндпоинтов
   * fixtures - фикстуры для тестов
   * src - код тестов
