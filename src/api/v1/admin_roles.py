@@ -8,11 +8,13 @@ from sqlalchemy.exc import DataError
 from api.v1.models.admin_roles import admin_role_base_schema, admin_role_all_schema, admin_role_name_schema
 from db.models import Role
 from db.pg_db import db
+from services.auth.role_checker import admin_required
 
 admin_roles_bp = Blueprint('admin_roles', __name__)
 
 
 @admin_roles_bp.route('/', methods=['GET'])
+@admin_required
 def roles_all():
     roles_db = Role.query.all()
     result = admin_role_all_schema.dump(roles_db)
@@ -21,6 +23,7 @@ def roles_all():
 
 
 @admin_roles_bp.route('/', methods=['POST'])
+@admin_required
 def role_create():
     role_data = request.get_json()
     try:
@@ -40,6 +43,7 @@ def role_create():
 
 
 @admin_roles_bp.route('/<role_id>', methods=['GET'])
+@admin_required
 def role_info(role_id: UUID):
     try:
         role = Role.query.filter_by(id=role_id).first()
@@ -55,6 +59,7 @@ def role_info(role_id: UUID):
 
 
 @admin_roles_bp.route('/<role_id>', methods=['PUT'])
+@admin_required
 def role_update(role_id: UUID):
     role_data = request.get_json()
     try:
@@ -80,6 +85,7 @@ def role_update(role_id: UUID):
 
 
 @admin_roles_bp.route('/<role_id>', methods=['DELETE'])
+@admin_required
 def role_delete(role_id: UUID):
     try:
         role = Role.query.filter_by(id=role_id).first()
