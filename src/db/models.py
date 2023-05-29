@@ -36,7 +36,7 @@ class User(db.Model):
         self.password = password
         self.name = name
         self.is_superuser = is_superuser
-        self.roles = roles
+        self.roles = roles or []
 
     def __repr__(self):
         return f'<User {self.login}>'

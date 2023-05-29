@@ -61,7 +61,6 @@ def user_update(user_id: UUID):
 
     user.is_superuser = body['is_superuser']
     user.roles = []
-    db.session.commit()
 
     for role_name in body['roles']:
         role = Role.query.filter(Role.name == role_name).first()
@@ -70,6 +69,7 @@ def user_update(user_id: UUID):
 
         user_role = UserRole(user_id=user_id, role_id=role.id)
         db.session.add(user_role)
-        db.session.commit()
+
+    db.session.commit()
 
     return {'message': 'User updated successfully'}, HTTPStatus.CREATED
