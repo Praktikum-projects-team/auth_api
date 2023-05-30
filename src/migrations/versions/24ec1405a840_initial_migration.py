@@ -67,4 +67,3 @@ def downgrade():
     op.drop_table('login_history')
     op.drop_table('users')
     op.drop_table('roles')
-

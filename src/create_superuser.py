@@ -44,6 +44,7 @@ def createsuperuser(login, password):
         logging.warning("Superuser already exist")
         return
 
+    # Создаем суперпользователя, если он не был создан
     with conn.cursor() as cursor:
         created_at = datetime.utcnow()
         cursor.execute(
@@ -52,8 +53,6 @@ def createsuperuser(login, password):
             (user_id, login, hashed_password, True, created_at)
         )
         conn.commit()
-
-    conn.close()
 
     logging.info("Superuser successfully created")
 

@@ -32,7 +32,7 @@ def sign_up():
     except UserAlreadyExists as err:
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
-    return jsonify(msg='user created'), HTTPStatus.CREATED
+    return jsonify(msg='User created'), HTTPStatus.CREATED
 
 
 @auth_bp.route('/login', methods=['POST'])

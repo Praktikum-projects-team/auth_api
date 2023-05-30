@@ -21,4 +21,3 @@ passlib==1.7.4
 flask_jwt_extended==4.4.4
 marshmallow-sqlalchemy==0.29.0
 flask-migrate==4.0.4
-python-dotenv==1.0.0
