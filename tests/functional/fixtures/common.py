@@ -8,6 +8,7 @@ import requests
 from passlib.handlers.pbkdf2 import pbkdf2_sha256
 
 from tests.functional.utils.constants import AdminData, RoleName, UserData
+from tests.functional.utils.helpers import create_user
 from tests.functional.utils.routes import AUTH_URL_LOGIN, AUTH_URL_SIGN_UP
 
 
@@ -88,3 +89,14 @@ def access_token_user():
         raise Exception(resp_data['message'])
 
     return resp_data['access_token']
+
+
+@pytest.fixture()
+def user_data_with_access_token():
+    user_data = create_user()
+    resp = requests.post(AUTH_URL_LOGIN, json={'login': user_data['login'], 'password': user_data['password']})
+    resp_data = resp.json()
+    if resp.status_code != HTTPStatus.OK:
+        raise Exception(resp_data['message'])
+
+    return {'access_token': resp_data['access_token'], 'user_data': user_data}

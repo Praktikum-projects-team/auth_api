@@ -3,9 +3,13 @@ from http import HTTPStatus
 import pytest
 
 from tests.functional.testdata.user import get_user_data
-from tests.functional.utils.constants import UserData
 from tests.functional.utils.helpers import make_post_request
-from tests.functional.utils.routes import AUTH_URL_LOGIN, AUTH_URL_LOGOUT, AUTH_URL_SIGN_UP
+from tests.functional.utils.routes import (
+    AUTH_URL_CHECK_ACCESS_TOKEN,
+    AUTH_URL_LOGIN,
+    AUTH_URL_LOGOUT,
+    AUTH_URL_SIGN_UP
+)
 
 
 class TestAuthSignUp:
@@ -208,11 +212,8 @@ class TestAuthLogin:
 
 class TestAuthLogout:
 
-    user_data = {'login': UserData.LOGIN, 'password': UserData.PASSWORD}
-
     def test_auth_logout(self, access_token_user):
         """Checking logout"""
-        make_post_request(AUTH_URL_LOGIN, body=self.user_data)
         resp = make_post_request(AUTH_URL_LOGOUT, access_token=access_token_user)
 
         assert resp.status == HTTPStatus.OK, 'Wrong status code'
@@ -220,7 +221,6 @@ class TestAuthLogout:
 
     def test_auth_logout_with_token_revoked(self, access_token_user):
         """Checking logout with token revoked"""
-        make_post_request(AUTH_URL_LOGIN, body=self.user_data)
         make_post_request(AUTH_URL_LOGOUT, access_token=access_token_user)
         resp = make_post_request(AUTH_URL_LOGOUT, access_token=access_token_user)
 
@@ -229,7 +229,6 @@ class TestAuthLogout:
 
     def test_auth_logout_without_access_token(self):
         """Checking logout without access token"""
-        make_post_request(AUTH_URL_LOGIN, body=self.user_data)
         resp = make_post_request(AUTH_URL_LOGOUT)
 
         assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
@@ -238,7 +237,6 @@ class TestAuthLogout:
     @pytest.mark.parametrize('access_token', ['access_token_str', 1, 0, 2.5, -1, 1000000])
     def test_auth_logout_with_access_token_invalid(self, access_token):
         """Checking logout with access token invalid"""
-        make_post_request(AUTH_URL_LOGIN, body=self.user_data)
         resp = make_post_request(AUTH_URL_LOGOUT, access_token=access_token)
 
         assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
@@ -246,8 +244,47 @@ class TestAuthLogout:
 
     def test_auth_logout_with_access_token_empty(self):
         """Checking logout with access token empty"""
-        make_post_request(AUTH_URL_LOGIN, body=self.user_data)
         resp = make_post_request(AUTH_URL_LOGOUT, access_token='')
+
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
+        assert resp.body['msg'] == "Bad Authorization header. Expected 'Authorization: Bearer <JWT>'", 'Wrong message'
+
+
+class TestAuthCheckAccessToken:
+
+    def test_check_access_token(self, user_data_with_access_token):
+        """Checking access token"""
+        resp = make_post_request(AUTH_URL_CHECK_ACCESS_TOKEN, access_token=user_data_with_access_token['access_token'])
+
+        assert resp.status == HTTPStatus.OK, 'Wrong status code'
+        assert resp.body['user'] == user_data_with_access_token['user_data']['login'], 'Wrong answer'
+
+    def test_auth_check_access_token_revoked(self, access_token_user):
+        """Checking access token with token revoked"""
+        make_post_request(AUTH_URL_LOGOUT, access_token=access_token_user)
+        resp = make_post_request(AUTH_URL_CHECK_ACCESS_TOKEN, access_token=access_token_user)
+
+        assert resp.status == HTTPStatus.UNAUTHORIZED, 'Wrong status code'
+        assert resp.body['msg'] == 'Token has been revoked', 'Wrong message'
+
+    def test_auth_check_without_access_token(self):
+        """Checking without access token"""
+        resp = make_post_request(AUTH_URL_CHECK_ACCESS_TOKEN)
+
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
+        assert resp.body['msg'] == 'Not enough segments', 'Wrong message'
+
+    @pytest.mark.parametrize('access_token', ['access_token_str', 1, 0, 2.5, -1, 1000000])
+    def test_auth_check_access_token_invalid(self, access_token):
+        """Checking with access token invalid"""
+        resp = make_post_request(AUTH_URL_CHECK_ACCESS_TOKEN, access_token=access_token)
+
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
+        assert resp.body['msg'] == 'Not enough segments', 'Wrong message'
+
+    def test_auth_check_access_token_empty(self):
+        """Checking with access token empty"""
+        resp = make_post_request(AUTH_URL_CHECK_ACCESS_TOKEN, access_token='')
 
         assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
         assert resp.body['msg'] == "Bad Authorization header. Expected 'Authorization: Bearer <JWT>'", 'Wrong message'
