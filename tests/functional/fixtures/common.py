@@ -92,11 +92,16 @@ def access_token_user():
 
 
 @pytest.fixture()
-def user_data_with_access_token():
+def user_data_with_tokens():
     user_data = create_user()
     resp = requests.post(AUTH_URL_LOGIN, json={'login': user_data['login'], 'password': user_data['password']})
+
     resp_data = resp.json()
     if resp.status_code != HTTPStatus.OK:
         raise Exception(resp_data['message'])
 
-    return {'access_token': resp_data['access_token'], 'user_data': user_data}
+    return {
+        'access_token': resp_data['access_token'],
+        'refresh_token': resp_data['refresh_token'],
+        'user_data': user_data
+    }

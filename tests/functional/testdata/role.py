@@ -16,7 +16,7 @@ def get_role_data() -> dict:
 
 
 def get_role_id_by_name(name: str, access_token: str) -> int:
-    resp = make_get_request(ROLES_URL, access_token=access_token)
+    resp = make_get_request(ROLES_URL, token=access_token)
     for role in resp.body:
         if role['name'] == name:
 
