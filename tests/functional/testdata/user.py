@@ -5,6 +5,17 @@ from tests.functional.utils.constants import UserData
 fake = Faker()
 
 
+def get_user_data() -> dict:
+    user_data = {
+        "id": fake.uuid4(),
+        "login": fake.email(),
+        "password": fake.password(),
+        "name": fake.name()
+    }
+
+    return user_data
+
+
 def get_user_sign_up_data() -> dict:
     user_data = {
         "id": fake.uuid4(),
@@ -14,10 +25,3 @@ def get_user_sign_up_data() -> dict:
     }
     return user_data
 
-
-def get_user_login_data() -> dict:
-    user_data = {
-        "login": UserData.LOGIN,
-        "password": UserData.PASSWORD
-    }
-    return user_data

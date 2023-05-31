@@ -1,17 +1,15 @@
 from http import HTTPStatus
 
-import pytest
-
-from tests.functional.testdata.user import get_user_sign_up_data
 from tests.functional.utils.helpers import (
-    make_delete_request,
     make_get_request,
-    make_post_request,
     make_put_request,
     sign_up_user,
-    get_user_token
+    access_token_user_after_login_changed,
+    access_token_user_after_password_changed,
+    create_user
 )
 from tests.functional.utils.routes import USER_URL
+from tests.functional.utils.constants import UserData
 
 
 class TestUser:
@@ -19,10 +17,8 @@ class TestUser:
     def test_user_info(self, access_token_user):
         sign_up_user()
         resp = make_get_request(USER_URL, access_token=access_token_user)
-        expected_fields = ['name', 'login', 'created_at']
         assert resp.status == HTTPStatus.OK, 'Wrong status code'
-        for field in expected_fields:
-            assert field in resp.body[0], f'No {field} in resp'
+        assert resp.body['login'] == UserData.LOGIN, 'Wrong login'
 
     def test_user_change_info(self, access_token_user):
         sign_up_user()
@@ -34,21 +30,46 @@ class TestUser:
     def test_user_login_history(self, access_token_user):
         sign_up_user()
         resp = make_get_request(f'{USER_URL}/login_history', access_token=access_token_user)
-        expected_fields = ['user_id', 'user_agent', 'auth_datetime']
+        expected_fields = ['id', 'user_agent', 'auth_datetime']
         assert resp.status == HTTPStatus.OK, 'Wrong status code'
         for field in expected_fields:
             assert field in resp.body[0], f'No {field} in resp'
 
     def test_user_change_login(self, access_token_user):
         sign_up_user()
-        resp_put = make_put_request(USER_URL, body={'new_login': "newuserlogin@user.ru"}, access_token=access_token_user)
-        resp = make_get_request(USER_URL, access_token=access_token_user)
+        resp_put = make_put_request(f'{USER_URL}/change_login', body={'new_login': UserData.NEW_LOGIN},
+                                    access_token=access_token_user)
+        resp = make_get_request(USER_URL, access_token=access_token_user_after_login_changed())
+
         assert resp_put.status == HTTPStatus.CREATED, 'Wrong status code'
-        assert resp.status == HTTPStatus.NOT_FOUND, 'Wrong status code'
+        assert resp.status == HTTPStatus.OK, 'Wrong status code'
+        assert resp.body['login'] == UserData.NEW_LOGIN, 'Wrong login'
+        resp_put_back = make_put_request(f'{USER_URL}/change_login', body={'new_login': UserData.LOGIN},
+                                         access_token=access_token_user_after_login_changed())
+
+    def test_user_change_login_duplicate(self, access_token_user):
+        sign_up_user()
+        resp = make_put_request(f'{USER_URL}/change_login', body={'new_login': create_user()['login']},
+                                access_token=access_token_user)
+        assert resp.status == HTTPStatus.CONFLICT, 'Wrong status code'
+        assert resp.body['message'] == 'Login already exist', 'Wrong message'
 
     def test_user_change_password(self, access_token_user):
         sign_up_user()
-        resp_put = make_put_request(USER_URL, body={'old_password': "123qwe", 'new_password': "122qwe"}, access_token=access_token_user)
-        resp = make_get_request(USER_URL, access_token=access_token_user)
+        resp_put = make_put_request(f'{USER_URL}/change_password',
+                                    body={'old_password': UserData.PASSWORD, 'new_password': UserData.NEW_PASSWORD},
+                                    access_token=access_token_user)
+        resp = make_get_request(USER_URL, access_token=access_token_user_after_password_changed())
         assert resp_put.status == HTTPStatus.CREATED, 'Wrong status code'
-        assert resp.status == HTTPStatus.NOT_FOUND, 'Wrong status code'
+        assert resp.status == HTTPStatus.OK, 'Wrong status code'
+        resp_put_back = make_put_request(f'{USER_URL}/change_password', body={'old_password': UserData.NEW_PASSWORD,
+                                                                              'new_password': UserData.PASSWORD},
+                                         access_token=access_token_user_after_password_changed())
+
+    def test_user_change_password_incorrect(self, access_token_user):
+        sign_up_user()
+        resp = make_put_request(f'{USER_URL}/change_password',
+                                body={'old_password': create_user()['password'], 'new_password': UserData.NEW_PASSWORD},
+                                access_token=access_token_user)
+        assert resp.status == HTTPStatus.CONFLICT, 'Wrong status code'
+        assert resp.body['message'] == 'Incorrect old password', 'Wrong message'

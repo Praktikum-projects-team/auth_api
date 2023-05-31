@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import pytest
 
-from tests.functional.testdata.user import get_user_sign_up_data
+from tests.functional.testdata.user import get_user_data
 from tests.functional.utils.constants import RoleName
 from tests.functional.utils.helpers import (
     create_role,
@@ -43,7 +43,7 @@ class TestAdminUsers:
 
     def test_admin_users_info_not_found(self, access_token_admin):
         """Checking info about user that does not exist"""
-        user_data = get_user_sign_up_data()
+        user_data = get_user_data()
         resp = make_get_request(f'{ADMIN_USER_URL}/{user_data["id"]}', access_token=access_token_admin)
 
         assert resp.status == HTTPStatus.NOT_FOUND, 'Wrong status code'
@@ -83,7 +83,7 @@ class TestAdminUsers:
 
     def test_admin_users_update_not_found(self, access_token_admin):
         """Checking update user not found"""
-        user_data = get_user_sign_up_data()
+        user_data = get_user_data()
 
         resp = make_put_request(
             f'{ADMIN_USER_URL}/{user_data["id"]}',

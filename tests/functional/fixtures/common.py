@@ -88,4 +88,3 @@ def access_token_user():
         raise Exception(resp_data['message'])
 
     return resp_data['access_token']
-
