@@ -7,6 +7,7 @@ fake = Faker()
 
 def get_user_sign_up_data() -> dict:
     user_data = {
+        "id": fake.uuid4(),
         "name": fake.name(),
         "login": UserData.LOGIN,
         "password": UserData.PASSWORD

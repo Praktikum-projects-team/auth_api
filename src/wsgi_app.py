@@ -2,9 +2,9 @@ from gevent import monkey
 
 monkey.patch_all()
 
-from app import create_app
+from app import app
 
-app = create_app()
+# app = create_app()
 
 
 # Todo: удалить после написания всех апи, временно оставлено в качестве пинга
