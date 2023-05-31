@@ -3,8 +3,9 @@ from http import HTTPStatus
 import pytest
 
 from tests.functional.testdata.user import get_user_data
+from tests.functional.utils.constants import UserData
 from tests.functional.utils.helpers import make_post_request
-from tests.functional.utils.routes import AUTH_URL_SIGN_UP
+from tests.functional.utils.routes import AUTH_URL_LOGIN, AUTH_URL_LOGOUT, AUTH_URL_SIGN_UP
 
 
 class TestAuthSignUp:
@@ -143,3 +144,110 @@ class TestAuthSignUp:
         assert resp.body['message']['login'][0] == 'Not a valid email address.', 'Wrong message'
         assert resp.body['message']['name'][0] == 'Not a valid string.', 'Wrong message'
         assert resp.body['message']['password'][0] == 'Not a valid string.', 'Wrong message'
+
+
+class TestAuthLogin:
+    def test_auth_login(self):
+        """Checking login"""
+        user_data = get_user_data()
+        user_data.pop('id')
+        make_post_request(AUTH_URL_SIGN_UP, body=user_data)
+        user_data.pop('name')
+        resp = make_post_request(AUTH_URL_LOGIN, body=user_data)
+
+        assert resp.status == HTTPStatus.OK, 'Wrong status code'
+        for field in ['access_token', 'refresh_token']:
+            assert field in resp.body, f'No {field} in resp'
+
+    def test_auth_login_incorrect(self):
+        """Checking login incorrect"""
+        user_data = get_user_data()
+        user_data.pop('id')
+        make_post_request(AUTH_URL_SIGN_UP, body=user_data)
+        user_data.pop('name')
+        user_data.update({'login': 'user_not_exist@user.ru'})
+        resp = make_post_request(AUTH_URL_LOGIN, body=user_data)
+
+        assert resp.status == HTTPStatus.UNAUTHORIZED, 'Wrong status code'
+        assert resp.body['message'] == 'Login or password is incorrect', 'Wrong message'
+
+    def test_auth_password_incorrect(self):
+        """Checking password incorrect"""
+        user_data = get_user_data()
+        user_data.pop('id')
+        make_post_request(AUTH_URL_SIGN_UP, body=user_data)
+        user_data.pop('name')
+        user_data.update({'password': 'password_not_exist'})
+        resp = make_post_request(AUTH_URL_LOGIN, body=user_data)
+
+        assert resp.status == HTTPStatus.UNAUTHORIZED, 'Wrong status code'
+        assert resp.body['message'] == 'Login or password is incorrect', 'Wrong message'
+
+    @pytest.mark.parametrize('login', ['user4@user', 'user4@', '', 'логин@', '***@***.**', 1, 0, 2.5, -1, 1000000])
+    def test_auth_login_invalid(self, login):
+        """Checking invalid login"""
+        user_data = get_user_data()
+        user_data.pop('id')
+        user_data.update({'login': login})
+        resp = make_post_request(AUTH_URL_LOGIN, body=user_data)
+
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
+        assert resp.body['message']['login'][0] == 'Not a valid email address.', 'Wrong message'
+
+    @pytest.mark.parametrize('password', [1, 0, 2.5, -1, 1000000])
+    def test_auth_password_invalid(self, password):
+        """Checking invalid password"""
+        user_data = get_user_data()
+        user_data.pop('id')
+        user_data.update({'password': password})
+        resp = make_post_request(AUTH_URL_LOGIN, body=user_data)
+
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
+        assert resp.body['message']['password'][0] == 'Not a valid string.', 'Wrong message'
+
+
+class TestAuthLogout:
+
+    user_data = {'login': UserData.LOGIN, 'password': UserData.PASSWORD}
+
+    def test_auth_logout(self, access_token_user):
+        """Checking logout"""
+        make_post_request(AUTH_URL_LOGIN, body=self.user_data)
+        resp = make_post_request(AUTH_URL_LOGOUT, access_token=access_token_user)
+
+        assert resp.status == HTTPStatus.OK, 'Wrong status code'
+        assert resp.body['msg'] == 'access token successfully revoked', 'Wrong message'
+
+    def test_auth_logout_with_token_revoked(self, access_token_user):
+        """Checking logout with token revoked"""
+        make_post_request(AUTH_URL_LOGIN, body=self.user_data)
+        make_post_request(AUTH_URL_LOGOUT, access_token=access_token_user)
+        resp = make_post_request(AUTH_URL_LOGOUT, access_token=access_token_user)
+
+        assert resp.status == HTTPStatus.UNAUTHORIZED, 'Wrong status code'
+        assert resp.body['msg'] == 'Token has been revoked', 'Wrong message'
+
+    def test_auth_logout_without_access_token(self):
+        """Checking logout without access token"""
+        make_post_request(AUTH_URL_LOGIN, body=self.user_data)
+        resp = make_post_request(AUTH_URL_LOGOUT)
+
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
+        assert resp.body['msg'] == 'Not enough segments', 'Wrong message'
+
+    @pytest.mark.parametrize('access_token', ['access_token_str', 1, 0, 2.5, -1, 1000000])
+    def test_auth_logout_with_access_token_invalid(self, access_token):
+        """Checking logout with access token invalid"""
+        make_post_request(AUTH_URL_LOGIN, body=self.user_data)
+        resp = make_post_request(AUTH_URL_LOGOUT, access_token=access_token)
+
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
+        assert resp.body['msg'] == 'Not enough segments', 'Wrong message'
+
+    def test_auth_logout_with_access_token_empty(self):
+        """Checking logout with access token empty"""
+        make_post_request(AUTH_URL_LOGIN, body=self.user_data)
+        resp = make_post_request(AUTH_URL_LOGOUT, access_token='')
+
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY, 'Wrong status code'
+        assert resp.body['msg'] == "Bad Authorization header. Expected 'Authorization: Bearer <JWT>'", 'Wrong message'
