@@ -87,7 +87,7 @@ class TestAdminUsers:
 
         resp = make_put_request(
             f'{ADMIN_USER_URL}/{user_data["id"]}',
-            body={'roles': RoleName.USER, 'is_superuser': False},
+            body={'roles': [RoleName.USER], 'is_superuser': False},
             token=access_token_admin
         )
 

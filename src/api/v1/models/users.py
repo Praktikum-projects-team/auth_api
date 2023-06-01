@@ -1,26 +1,26 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 
 from api.v1.models.marshmallow_init import ma
 from db.models import LoginHistory as LoginHistoryModel
 
 
 class UsersSchema(Schema):
-    name = fields.Str()
-    login = fields.Str()
+    name = fields.Str(validate=validate.Length(min=1, max=100))
+    login = fields.Str(validate=validate.Length(min=1, max=50))
     created_at = fields.DateTime()
 
 
 class UserChangeData(Schema):
-    name = fields.Str(required=True)
+    name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
 
 
 class ChangeLogin(Schema):
-    new_login = fields.Str(required=True)
+    new_login = fields.Str(required=True, validate=validate.Length(min=1, max=50))
 
 
 class ChangePassword(Schema):
-    old_password = fields.Str(required=True)
-    new_password = fields.Str(required=True)
+    old_password = fields.Str(required=True, validate=validate.Length(min=6, max=50))
+    new_password = fields.Str(required=True, validate=validate.Length(min=6, max=50))
 
 
 class LoginHistory(ma.SQLAlchemyAutoSchema):

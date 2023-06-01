@@ -21,7 +21,6 @@ class AdminUserInfoSchema(ma.Schema):
 
 class AdminUserUpdateSchema(ma.Schema):
     is_superuser = fields.Boolean(required=True)
-    # roles = fields.Nested(AdminRoleNameSchema, required=True, many=True)
     roles = fields.List(fields.String(), required=True, many=True)
 
 
