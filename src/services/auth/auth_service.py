@@ -40,7 +40,7 @@ def sign_up_user(user):
     try:
         create_new_user(user)
     except IntegrityError:
-        raise UserAlreadyExists(f'user with login {user["login"]} already exists')
+        raise UserAlreadyExists(f'User with login {user["login"]} already exists')
 
 
 def generate_token_pair(identity):
@@ -54,7 +54,7 @@ def generate_token_pair(identity):
 def login_user(login: str, password: str, user_agent: str):
     user = get_user_by_login(login)
     if not user or not verify_password(password=password, hashed_password=user.password):
-        raise UserIncorrectLoginData('login or password is incorrect')
+        raise UserIncorrectLoginData('Login or password is incorrect')
 
     tokens = generate_token_pair(identity=user.login)
     add_login_history_record(user_id=user.id, user_agent=user_agent)

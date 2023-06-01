@@ -12,3 +12,6 @@ class UserData:
     LOGIN = "user@test.ru"
     PASSWORD = "123qwe"
     NAME = "test_user"
+
+
+USER_DATA_DEFAULT = {'login': UserData.LOGIN, 'password': UserData.PASSWORD}

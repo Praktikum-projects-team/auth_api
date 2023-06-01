@@ -35,7 +35,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"login\": \"user4@user.ru\",\n    \"password\": \"123qwe\"\n}",
+					"raw": "{\n    \"login\": \"user@user.ru\",\n    \"password\": \"123qwe\",\n    \"name\": \"BlackMetall\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -78,6 +78,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -216,6 +226,16 @@
 		{
 			"name": "admin role - список ролей",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -234,6 +254,16 @@
 		{
 			"name": "admin role - одна роль",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -253,11 +283,21 @@
 		{
 			"name": "admin role - добавить роль",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"User\"\n}",
+					"raw": "{\n    \"name\": \"admin\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -281,6 +321,16 @@
 		{
 			"name": "admin role - изменить роль",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -309,6 +359,16 @@
 		{
 			"name": "admin role - удалить роль",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [],
 				"body": {
@@ -337,6 +397,16 @@
 		{
 			"name": "admin user - список юзеров",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -355,17 +425,27 @@
 		{
 			"name": "admin user - один юзер",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{app_url}}/admin/users/da22b67d-2243-4dbb-894e-48c98a83eb42",
+					"raw": "{{app_url}}/admin/users/4d2060fb-d403-4598-9494-b745d3ebc66f",
 					"host": [
 						"{{app_url}}"
 					],
 					"path": [
 						"admin",
 						"users",
-						"da22b67d-2243-4dbb-894e-48c98a83eb42"
+						"4d2060fb-d403-4598-9494-b745d3ebc66f"
 					]
 				}
 			},
@@ -374,11 +454,21 @@
 		{
 			"name": "admin user - изменить юзера",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"user_2\"\n}",
+					"raw": "{\n    \"is_superuser\": true,\n    \"roles\": [\n        \"admin\", \"user\"\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -386,14 +476,184 @@
 					}
 				},
 				"url": {
-					"raw": "{{app_url}}/admin/users/148a8ec2-1e6a-44dc-8aae-9bb427279068",
+					"raw": "{{app_url}}/admin/users/4d2060fb-d403-4598-9494-b745d3ebc66f",
 					"host": [
 						"{{app_url}}"
 					],
 					"path": [
 						"admin",
 						"users",
-						"148a8ec2-1e6a-44dc-8aae-9bb427279068"
+						"4d2060fb-d403-4598-9494-b745d3ebc66f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user - профиль пользователя",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/user/profile",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"user",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user - история входов",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/user/profile/login_history",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"user",
+						"profile",
+						"login_history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user - изминить личные даные",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"new_name\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/user/profile",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"user",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user - изминить логин",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"new_login\": \"user_update_login@user.ru\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/user/profile/change_login",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"user",
+						"profile",
+						"change_login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user - изминить пароль",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"old_password\": \"123qwe\",\n    \"new_password\": \"111qwe\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/user/profile/change_password",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"user",
+						"profile",
+						"change_password"
 					]
 				}
 			},
