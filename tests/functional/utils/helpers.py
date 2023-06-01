@@ -5,9 +5,8 @@ from typing import Any
 import requests
 from psycopg2 import DataError
 from pydantic import BaseModel
-from tests.functional.utils.routes import AUTH_URL_LOGIN, AUTH_URL_SIGN_UP
-from tests.functional.utils.constants import UserData
-from tests.functional.testdata.user import get_user_sign_up_data, get_user_data
+from tests.functional.utils.routes import AUTH_URL_LOGIN
+from tests.functional.testdata.user import get_user_data
 
 from tests.functional.utils.routes import ADMIN_USER_URL, AUTH_URL_SIGN_UP, ROLES_URL
 
@@ -59,15 +58,6 @@ def make_delete_request(url: str, url_params: dict = None, token: str = None):
     return make_request(method="delete", url=url, url_params=url_params, token=token)
 
 
-def sign_up_user():
-    user_data = get_user_sign_up_data()
-    make_post_request(AUTH_URL_SIGN_UP, body={
-        'login': user_data['login'],
-        'name': user_data['name'],
-        'password': user_data['password']
-    })
-
-
 def get_user_id_by_login(login: str, access_token: str) -> int:
     users = make_get_request(ADMIN_USER_URL, token=access_token)
     for user in users.body:
@@ -92,22 +82,10 @@ def create_role(role_name: str, access_token: str):
         make_post_request(ROLES_URL, body={'name': role_name}, token=access_token)
 
 
-def access_token_user_after_login_changed():
+def access_token_user_after_login_or_password_changed(login: str, password: str):
     resp = requests.post(AUTH_URL_LOGIN, json={
-        'login': UserData.NEW_LOGIN,
-        'password': UserData.PASSWORD
-    })
-    resp_data = resp.json()
-    if resp.status_code != HTTPStatus.OK:
-        raise Exception(resp_data['message'])
-
-    return resp_data['access_token']
-
-
-def access_token_user_after_password_changed():
-    resp = requests.post(AUTH_URL_LOGIN, json={
-        'login': UserData.LOGIN,
-        'password': UserData.NEW_PASSWORD
+        'login': login,
+        'password': password
     })
     resp_data = resp.json()
     if resp.status_code != HTTPStatus.OK:
