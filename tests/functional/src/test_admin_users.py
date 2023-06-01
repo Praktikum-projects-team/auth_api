@@ -20,7 +20,7 @@ class TestAdminUsers:
         """Checking to get a list of users"""
         for _ in range(3):
             create_user()
-        resp = make_get_request(ADMIN_USER_URL, access_token=access_token_admin)
+        resp = make_get_request(ADMIN_USER_URL, token=access_token_admin)
         expected_fields = ['id', 'name', 'login', 'created_at', 'roles', 'is_superuser']
 
         assert resp.status == HTTPStatus.OK, 'Wrong status code'
@@ -31,7 +31,7 @@ class TestAdminUsers:
         """Checking info about user"""
         user_data = create_user()
         user_id = get_user_id_by_login(user_data['login'], access_token=access_token_admin)
-        resp = make_get_request(f'{ADMIN_USER_URL}/{user_id}', access_token=access_token_admin)
+        resp = make_get_request(f'{ADMIN_USER_URL}/{user_id}', token=access_token_admin)
 
         assert resp.status == HTTPStatus.OK, 'Wrong status code'
         assert resp.body['id'] == user_id, 'Wrong id'
@@ -44,7 +44,7 @@ class TestAdminUsers:
     def test_admin_users_info_not_found(self, access_token_admin):
         """Checking info about user that does not exist"""
         user_data = get_user_data()
-        resp = make_get_request(f'{ADMIN_USER_URL}/{user_data["id"]}', access_token=access_token_admin)
+        resp = make_get_request(f'{ADMIN_USER_URL}/{user_data["id"]}', token=access_token_admin)
 
         assert resp.status == HTTPStatus.NOT_FOUND, 'Wrong status code'
         assert resp.body['message'] == 'User not found', 'Wrong message'
@@ -66,10 +66,10 @@ class TestAdminUsers:
         resp = make_put_request(
             f'{ADMIN_USER_URL}/{user_id}',
             body={'roles': roles_name, 'is_superuser': is_superuser},
-            access_token=access_token_admin
+            token=access_token_admin
         )
 
-        resp_after_update = make_get_request(f'{ADMIN_USER_URL}/{user_id}', access_token=access_token_admin)
+        resp_after_update = make_get_request(f'{ADMIN_USER_URL}/{user_id}', token=access_token_admin)
 
         assert resp.status == HTTPStatus.CREATED, 'Wrong status code'
         assert resp.body['message'] == 'User updated successfully', 'Wrong message'
@@ -88,7 +88,7 @@ class TestAdminUsers:
         resp = make_put_request(
             f'{ADMIN_USER_URL}/{user_data["id"]}',
             body={'roles': RoleName.USER, 'is_superuser': False},
-            access_token=access_token_admin
+            token=access_token_admin
         )
 
         assert resp.status == HTTPStatus.NOT_FOUND, 'Wrong status code'
@@ -103,7 +103,7 @@ class TestAdminUsers:
         resp = make_put_request(
             f'{ADMIN_USER_URL}/{user_id}',
             body={'roles': roles_name, 'is_superuser': False},
-            access_token=access_token_admin
+            token=access_token_admin
         )
 
         assert resp.status == HTTPStatus.NOT_FOUND, 'Wrong status code'

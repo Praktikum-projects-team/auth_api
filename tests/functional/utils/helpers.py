@@ -36,27 +36,27 @@ class ApiResponse(BaseModel):
 
 
 def make_request(
-        method: str, url: str, url_params: dict = None, body: dict = None, access_token: str = None
+        method: str, url: str, url_params: dict = None, body: dict = None, token: str = None
 ) -> ApiResponse:
-    headers = {'Authorization': f'Bearer {access_token}'}
+    headers = {'Authorization': f'Bearer {token}'}
     resp = getattr(requests, method)(url, params=url_params, json=body, headers=headers)
     return ApiResponse(status=resp.status_code, body=resp.json())
 
 
-def make_get_request(url: str, url_params: dict = None, access_token: str = None):
-    return make_request(method="get", url=url, url_params=url_params, access_token=access_token)
+def make_get_request(url: str, url_params: dict = None, token: str = None):
+    return make_request(method="get", url=url, url_params=url_params, token=token)
 
 
-def make_post_request(url: str, url_params: dict = None, body: dict = None, access_token: str = None):
-    return make_request(method="post", url=url, url_params=url_params, body=body, access_token=access_token)
+def make_post_request(url: str, url_params: dict = None, body: dict = None, token: str = None):
+    return make_request(method="post", url=url, url_params=url_params, body=body, token=token)
 
 
-def make_put_request(url: str, url_params: dict = None, body: dict = None, access_token: str = None):
-    return make_request(method="put", url=url, url_params=url_params, body=body, access_token=access_token)
+def make_put_request(url: str, url_params: dict = None, body: dict = None, token: str = None):
+    return make_request(method="put", url=url, url_params=url_params, body=body, token=token)
 
 
-def make_delete_request(url: str, url_params: dict = None, access_token: str = None):
-    return make_request(method="delete", url=url, url_params=url_params, access_token=access_token)
+def make_delete_request(url: str, url_params: dict = None, token: str = None):
+    return make_request(method="delete", url=url, url_params=url_params, token=token)
 
 
 def sign_up_user():
@@ -69,7 +69,7 @@ def sign_up_user():
 
 
 def get_user_id_by_login(login: str, access_token: str) -> int:
-    users = make_get_request(ADMIN_USER_URL, access_token=access_token)
+    users = make_get_request(ADMIN_USER_URL, token=access_token)
     for user in users.body:
         if user['login'] == login:
             return user['id']
@@ -89,7 +89,7 @@ def create_user():
 def create_role(role_name: str, access_token: str):
     role = make_get_request(ROLES_URL)
     if role_name not in role.body:
-        make_post_request(ROLES_URL, body={'name': role_name}, access_token=access_token)
+        make_post_request(ROLES_URL, body={'name': role_name}, token=access_token)
 
 
 def access_token_user_after_login_changed():
