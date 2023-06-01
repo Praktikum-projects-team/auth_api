@@ -1,7 +1,49 @@
-# auth_api
-Сервис авторизации
+# Сервис авторизации auth_api
+## Стек технологий
+* Python
+* Flask + gevent
+* SqlAlchemy
+* Pytest
+* Postgres
+* Redis
+* Docker
 
-Запуск приложения: docker-compose up --build
+## Компоненты
+* Cервер WSGI — сервер с запущенным приложением
+* Nginx — прокси-сервер для веб-приложения
+* Postgres — база данных с данными сервиса
+* Redis — хранилище данных для токенов
+* SQLAlchemy — ORM для Postgres 
 
-Создание суперпользователя: python src/create_superuser.py [superuser_login] [superuser_password]
+## Полезные команды
+* Запуск приложения из корня проекта: `docker-compose up --build`
+* Запуск тестов из директории tests: `docker-compose up --build`
+* Создание суперпользователя: `python src/create_superuser.py [superuser_login] [superuser_password]`
+* Генерация новой миграции: `flask db migrate -m "краткое описание вашей миграции"`
 
+## Структура проекта
+* src - код сервиса
+  * api/v1 - эндпоинты сервиса
+      * v1/models - модели для эндпоинтов
+      * v1/Api.postman_collection.json - коллекция запросов для postman
+    * core - конфигурация сервиса
+    * db - работа с базами данных postgres и redis
+    * services - слой логики для эндпоинтов
+    * openapi_documentation.yaml - файл с документацией
+* tests/functional/ - код тестов для эндпоинтов
+  * fixtures - фикстуры для тестов
+  * src - код тестов
+  * testdata - тестовые данные
+  * utils - роуты, константы, хелперы, чекеры, 
+
+## Описание Аpi
+
+* auth - регистрация и авторизация пользователя
+* users - пользовательские эндпоинты для работы с ЛК
+* admin_users - административные эндпоинты для управления пользователями
+* admin_roles - административные эндпоинты для управления ролями
+
+## Команда разработки
+* Лиана Нигматуллина - тимлид
+* Татьяна Акимова - разработчик
+* Софья Рытик - разработчик
