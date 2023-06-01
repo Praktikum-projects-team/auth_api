@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 from uuid import UUID
 
@@ -40,7 +41,9 @@ def role_create():
 
     try:
         create_role(body['name'])
+        logging.info("Role %s created successfully", body['name'])
     except RoleAlreadyExists as err:
+        logging.info("Role %s didn't created: role already exists", body['name'])
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return {'message': 'Role created successfully'}, HTTPStatus.CREATED
@@ -72,6 +75,7 @@ def role_update(role_id: UUID):
 
     try:
         update_role(role_id, body['name'])
+        logging.info("Role %s updated successfully", body['name'])
     except (ValueError, DataError) as err:
         return {'message': str(err)}, HTTPStatus.BAD_REQUEST
     except RoleNotFound as err:
@@ -87,6 +91,7 @@ def role_update(role_id: UUID):
 def role_delete(role_id: UUID):
     try:
         delete_role(role_id)
+        logging.info("Role %s deleted successfully", role_id)
     except (ValueError, DataError) as err:
         return {"message": str(err)}, HTTPStatus.BAD_REQUEST
     except RoleNotFound as err:

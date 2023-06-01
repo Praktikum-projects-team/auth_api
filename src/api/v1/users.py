@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 
 from flask import Blueprint, jsonify, request
@@ -30,6 +31,7 @@ def update_user_info():
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
     user_update(current_user, body)
+    logging.info("User with email %s updated", current_user)
     return {"message": "User updated successfully"}, HTTPStatus.CREATED
 
 
@@ -55,7 +57,9 @@ def change_user_login():
         return err.messages, HTTPStatus.BAD_REQUEST
     try:
         user_change_login(current_user, body)
+        logging.info("User with email %s updated login successfully", current_user)
     except LoginAlreadyExists as err:
+        logging.info("User with email %s denied to change login: new login already exists", current_user)
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
     return {"message": "User login updated successfully"}, HTTPStatus.CREATED
 
@@ -71,6 +75,8 @@ def change_user_password():
         return err.messages, HTTPStatus.BAD_REQUEST
     try:
         change_user_pw(current_user, body['old_password'], body['new_password'])
+        logging.info("User with email %s updated password successfully", current_user)
     except UserIncorrectPassword as err:
+        logging.info("User with email %s denied to change password: incorrect old password", current_user)
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
     return {"message": "User password updated successfully"}, HTTPStatus.CREATED

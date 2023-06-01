@@ -20,10 +20,10 @@ def insert_data(pg_conn, table_name, data):
     try:
         cursor.execute(query, tuple(data.values()))
         pg_conn.commit()
-        logging.info(f"Success to insert data into {table_name}")
+        logging.info("Success to insert data into %s", table_name)
     except DataError as e:
         pg_conn.rollback()
-        logging.error(f"Failed to insert data into {table_name}")
+        logging.error("Failed to insert data into %s", table_name)
         raise e
     finally:
         cursor.close()

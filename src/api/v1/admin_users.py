@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 from uuid import UUID
 
@@ -58,6 +59,7 @@ def user_update(user_id: UUID):
 
     try:
         update_user_admin(user_id, body)
+        logging.info("User with id %s updated successfully by admin", user_id)
     except (ValueError, DataError) as err:
         return {'message': str(err)}, HTTPStatus.BAD_REQUEST
     except UserNotFound as err:

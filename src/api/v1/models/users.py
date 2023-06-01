@@ -5,22 +5,22 @@ from db.models import LoginHistory as LoginHistoryModel
 
 
 class UsersSchema(Schema):
-    name = fields.Str(validate=validate.Length(min=1, max=100))
-    login = fields.Str(validate=validate.Length(min=1, max=50))
+    name = fields.Str(validate=validate.Length(max=100))
+    login = fields.Str(validate=validate.Length(max=50))
     created_at = fields.DateTime()
 
 
 class UserChangeData(Schema):
-    name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
+    name = fields.Str(required=True, validate=validate.Length(max=100))
 
 
 class ChangeLogin(Schema):
-    new_login = fields.Str(required=True, validate=validate.Length(min=1, max=50))
+    new_login = fields.Str(required=True, validate=validate.Length(max=50))
 
 
 class ChangePassword(Schema):
-    old_password = fields.Str(required=True, validate=validate.Length(min=6, max=50))
-    new_password = fields.Str(required=True, validate=validate.Length(min=6, max=50))
+    old_password = fields.Str(required=True, validate=validate.Length(max=50))
+    new_password = fields.Str(required=True, validate=validate.Length(max=50))
 
 
 class LoginHistory(ma.SQLAlchemyAutoSchema):

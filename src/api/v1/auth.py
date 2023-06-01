@@ -29,7 +29,9 @@ def sign_up():
 
     try:
         sign_up_user(user)
+        logging.info("User with email %s successfully signed in", user['login'])
     except UserAlreadyExists as err:
+        logging.info("User with email %s denied to sign up: user already exists", user['login'])
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return jsonify(msg='User created'), HTTPStatus.CREATED
@@ -46,7 +48,9 @@ def login():
 
     try:
         tokens = login_user(user['login'], user['password'], user_agent=user_agent)
+        logging.info("User with email %s successfully logged in", user['login'])
     except UserIncorrectLoginData as err:
+        logging.info("User with email %s denied to login: incorrect login or password", user['login'])
         return jsonify(message=str(err)), HTTPStatus.UNAUTHORIZED
 
     return login_out.dump(tokens)
