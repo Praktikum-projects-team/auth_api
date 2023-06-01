@@ -6,9 +6,16 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import DataError
 
 from api.v1.models.admin_roles import admin_role_base_schema, admin_role_all_schema, admin_role_name_schema
-from db.models import Role
-from db.pg_db import db
 from services.auth.role_checker import admin_required
+from services.role.role_service import (
+    roles_get_data,
+    create_role,
+    get_role_data,
+    update_role,
+    delete_role,
+    RoleAlreadyExists,
+    RoleNotFound
+)
 
 admin_roles_bp = Blueprint('admin_roles', __name__)
 
@@ -16,7 +23,7 @@ admin_roles_bp = Blueprint('admin_roles', __name__)
 @admin_roles_bp.route('/', methods=['GET'])
 @admin_required
 def roles_all():
-    roles_db = Role.query.all()
+    roles_db = roles_get_data()
     result = admin_role_all_schema.dump(roles_db)
 
     return jsonify(result)
@@ -31,13 +38,10 @@ def role_create():
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
 
-    role_exist = db.session.query(Role).filter(Role.name == body['name']).first()
-    if role_exist:
-        return {'message': 'Role already exist'}, HTTPStatus.CONFLICT
-
-    new_role = Role(name=body['name'])
-    db.session.add(new_role)
-    db.session.commit()
+    try:
+        create_role(body['name'])
+    except RoleAlreadyExists as err:
+        return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return {'message': 'Role created successfully'}, HTTPStatus.CREATED
 
@@ -46,12 +50,11 @@ def role_create():
 @admin_required
 def role_info(role_id: UUID):
     try:
-        role = Role.query.filter_by(id=role_id).first()
+        role = get_role_data(role_id)
     except (ValueError, DataError) as err:
         return {'message': str(err)}, HTTPStatus.BAD_REQUEST
-
-    if not role:
-        return {'message': 'Role not found'}, HTTPStatus.NOT_FOUND
+    except RoleNotFound as err:
+        return jsonify(message=str(err)), HTTPStatus.NOT_FOUND
 
     result = admin_role_base_schema.dump(role)
 
@@ -63,24 +66,19 @@ def role_info(role_id: UUID):
 def role_update(role_id: UUID):
     role_data = request.get_json()
     try:
-        role = Role.query.filter_by(id=role_id).first()
-    except (ValueError, DataError) as err:
-        return {'message': str(err)}, HTTPStatus.BAD_REQUEST
-
-    if not role:
-        return {'message': 'Role not found'}, HTTPStatus.NOT_FOUND
-
-    try:
         body = admin_role_name_schema.load(role_data)
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
 
-    name_exist = db.session.query(Role).filter(Role.name == body['name']).first()
-    if name_exist:
-        return {'message': 'Role with this name already exist'}, HTTPStatus.CONFLICT
+    try:
+        update_role(role_id, body['name'])
+    except (ValueError, DataError) as err:
+        return {'message': str(err)}, HTTPStatus.BAD_REQUEST
+    except RoleNotFound as err:
+        return jsonify(message=str(err)), HTTPStatus.NOT_FOUND
+    except RoleAlreadyExists as err:
+        return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
-    role.name = body['name']
-    db.session.commit()
     return {'message': 'Role updated successfully'}, HTTPStatus.CREATED
 
 
@@ -88,14 +86,10 @@ def role_update(role_id: UUID):
 @admin_required
 def role_delete(role_id: UUID):
     try:
-        role = Role.query.filter_by(id=role_id).first()
+        delete_role(role_id)
     except (ValueError, DataError) as err:
         return {"message": str(err)}, HTTPStatus.BAD_REQUEST
-
-    if not role:
-        return {'message': 'Role not found'}, HTTPStatus.NOT_FOUND
-
-    db.session.query(Role).filter_by(id=role.id).delete()
-    db.session.commit()
+    except RoleNotFound as err:
+        return jsonify(message=str(err)), HTTPStatus.NOT_FOUND
 
     return {'message': 'Role deleted successfully'}, HTTPStatus.OK
