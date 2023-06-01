@@ -1,9 +1,25 @@
-from db.queries.user import get_user_by_login, add_login_history_record
-from db.queries.user import create_new_user, get_login_history, does_user_exist
+from db.queries.user import (
+    get_user_by_login,
+    add_login_history_record,
+    create_new_user,
+    get_login_history,
+    does_user_exist,
+    user_admin_all,
+    get_user_by_id,
+    admin_update_user,
+    admin_update_user_roles
+)
 from db.pg_db import db
+from services.role.role_service import get_role_by_name, RoleNotFound
+from uuid import UUID
+from sqlalchemy.exc import DataError
 
 
 class LoginAlreadyExists(Exception):
+    ...
+
+
+class UserNotFound(Exception):
     ...
 
 
@@ -29,3 +45,31 @@ def user_change_login(login: str, new_data: dict):
         raise LoginAlreadyExists("Login already exist")
     user.login = new_data['new_login']
     db.session.commit()
+
+
+def get_user_admin_info():
+    return user_admin_all()
+
+
+def get_user_info(user_id: UUID):
+    user = get_user_by_id(user_id)
+    if not user:
+        raise UserNotFound("User not found")
+    return user
+
+
+def update_user_admin(user_id: UUID, body: dict):
+    try:
+        user = get_user_info(user_id)
+    except (UserNotFound, ValueError, DataError):
+        raise
+    user = admin_update_user(user, body['is_superuser'])
+    for role_name in body['roles']:
+        try:
+            role = get_role_by_name(role_name)
+        except RoleNotFound:
+            raise
+        admin_update_user_roles(user, role)
+    db.session.commit()
+
+

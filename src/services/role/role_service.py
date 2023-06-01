@@ -34,14 +34,23 @@ def get_role_data(role_id: UUID):
     return role
 
 
+def get_role_by_name(name: str):
+    role = does_role_exists(name)
+    if not role:
+        raise RoleNotFound(f'Role {name} not found')
+    return role
+
+
 def update_role(role_id: UUID, name: str):
-    role = get_role_data(role_id)
+    try:
+        role = get_role_data(role_id)
+    except RoleNotFound:
+        raise
     if does_role_exists(name):
         raise RoleAlreadyExists("Role with this name already exist")
-    update_role_data(role)
+    update_role_data(role, name)
 
 
 def delete_role(role_id: UUID):
     role = get_role_data(role_id)
     delete_role_data(role)
-
