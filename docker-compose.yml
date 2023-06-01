@@ -18,7 +18,7 @@ services:
       retries: 5
     restart: always
     ports:
-      - "5432:5432"
+      - ${DB_PORT}:${DB_PORT}
 
   redis:
     container_name: redis
