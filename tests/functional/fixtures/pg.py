@@ -6,8 +6,8 @@ from tests.functional.settings import TestSettings
 test_conf = TestSettings()
 
 
-@pytest.fixture(scope="session")
-def postgres_conn():
+@pytest.fixture(scope="session", autouse=True)
+def pg_conn():
     conn = psycopg2.connect(
         database=test_conf.name_db,
         user=test_conf.user_db,

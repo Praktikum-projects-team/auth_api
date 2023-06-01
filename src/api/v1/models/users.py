@@ -1,5 +1,5 @@
-from sqlalchemy.exc import NoResultFound
-from marshmallow import Schema, fields, ValidationError, pre_load
+from marshmallow import Schema, fields
+
 from api.v1.models.marshmallow_init import ma
 from db.models import LoginHistory as LoginHistoryModel
 
