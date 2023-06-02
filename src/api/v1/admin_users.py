@@ -2,7 +2,7 @@ import logging
 from http import HTTPStatus
 from uuid import UUID
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 from sqlalchemy.exc import DataError
 
@@ -11,11 +11,14 @@ from api.v1.models.admin_users import (
     admin_user_info_schema,
     admin_user_update_schema
 )
-from db.models import Role, User, UserRole
-from db.pg_db import db
 from services.auth.role_checker import admin_required
-from services.user.user_service import get_user_admin_info, get_user_info, update_user_admin, UserNotFound
 from services.role.role_service import RoleNotFound
+from services.user.user_service import (
+    UserNotFound,
+    get_user_admin_info,
+    get_user_info,
+    update_user_admin
+)
 
 admin_users_bp = Blueprint('admin_users_bp', __name__)
 

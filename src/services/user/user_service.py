@@ -2,8 +2,6 @@ import logging
 
 from db.queries.user import (
     get_user_by_login,
-    add_login_history_record,
-    create_new_user,
     get_login_history,
     does_user_exist,
     user_admin_all,

@@ -7,7 +7,13 @@ from marshmallow import ValidationError
 
 from api.v1.models.users import change_login, change_password, login_history, user_change_data, user_schema
 from services.auth.auth_service import UserIncorrectPassword, change_user_pw
-from services.user.user_service import user_login_history, user_get_data, user_update, user_change_login, LoginAlreadyExists
+from services.user.user_service import (
+    LoginAlreadyExists,
+    user_change_login,
+    user_get_data,
+    user_login_history,
+    user_update
+)
 
 users_bp = Blueprint("user", __name__)
 
