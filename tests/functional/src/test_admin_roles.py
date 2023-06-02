@@ -61,7 +61,7 @@ class TestRole:
         resp = make_get_request(f'{ROLES_URL}/{role_data["id"]}', token=access_token_admin)
 
         assert resp.status == HTTPStatus.NOT_FOUND, 'Wrong status code'
-        assert resp.body['message'] == 'Role not found', 'Wrong message'
+        assert resp.body['message'] == 'Role not found in db', 'Wrong message'
 
     def test_admin_roles_update(self, access_token_admin):
         """Checking update role"""
@@ -91,7 +91,7 @@ class TestRole:
         )
 
         assert resp.status == HTTPStatus.CONFLICT, 'Wrong status code'
-        assert resp.body['message'] == 'Role with this name already exist', 'Wrong message'
+        assert resp.body['message'] == 'Role with this name already exist in db', 'Wrong message'
 
     def test_admin_roles_update_not_found(self, access_token_admin):
         """Checking update role that does not exist"""
@@ -99,9 +99,8 @@ class TestRole:
         resp = make_put_request(
             f'{ROLES_URL}/{role_data["id"]}', body={'name': role_data['name']}, token=access_token_admin
         )
-
         assert resp.status == HTTPStatus.NOT_FOUND, 'Wrong status code'
-        assert resp.body['message'] == 'Role not found', 'Wrong message'
+        assert resp.body['message'] == 'Role not found in db', 'Wrong message'
 
     def test_admin_roles_delete(self, access_token_admin):
         """Checking delete role"""

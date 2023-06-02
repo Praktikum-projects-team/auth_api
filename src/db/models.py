@@ -11,7 +11,7 @@ class Role(db.Model):
     __tablename__ = 'roles'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String(50), nullable=False, unique=True)
 
     def __init__(self, name):
         self.name = name
@@ -24,10 +24,10 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    login = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
+    login = Column(String(50), unique=True, nullable=False)
+    password = Column(String(50), nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    name = Column(String, nullable=True)
+    name = Column(String(100), nullable=True)
     is_superuser = Column(Boolean, default=False)
     roles = db.relationship(Role, secondary='user_roles')
 
@@ -47,7 +47,7 @@ class LoginHistory(db.Model):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey(User.id), nullable=False)
-    user_agent = Column(String, nullable=False)
+    user_agent = Column(String(50), nullable=False)
     auth_datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, user_id, user_agent):
