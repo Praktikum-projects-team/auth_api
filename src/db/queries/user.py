@@ -3,7 +3,6 @@ from uuid import UUID
 from constants import RoleName
 from db.models import Role, User, LoginHistory, UserRole
 from db.pg_db import db
-from db.queries.roles import does_role_exists
 
 
 def get_user_by_login(login: str):

@@ -17,8 +17,6 @@ services:
       timeout: 5s
       retries: 5
     restart: always
-    ports:
-      - ${DB_PORT}:${DB_PORT}
 
   redis:
     container_name: redis
