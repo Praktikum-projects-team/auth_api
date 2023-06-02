@@ -1,3 +1,5 @@
+import logging
+
 from db.queries.user import (
     get_user_by_login,
     add_login_history_record,
@@ -35,7 +37,9 @@ def user_login_history(login: str, page: int, page_size: int):
 def user_update(login: str, new_data: dict):
     user = get_user_by_login(login)
     user.name = new_data['name']
+
     db.session.commit()
+    logging.info('User in db %s updated successfully', login)
 
 
 def user_change_login(login: str, new_data: dict):
@@ -44,7 +48,9 @@ def user_change_login(login: str, new_data: dict):
     if login_exists:
         raise LoginAlreadyExists("Login already exist")
     user.login = new_data['new_login']
+
     db.session.commit()
+    logging.info('User login in db %s updated successfully', login)
 
 
 def get_user_admin_info():
@@ -54,7 +60,9 @@ def get_user_admin_info():
 def get_user_info(user_id: UUID):
     user = get_user_by_id(user_id)
     if not user:
-        raise UserNotFound("User not found")
+        raise UserNotFound('User not found')
+    logging.info('User in db %s found', user_id)
+
     return user
 
 
@@ -64,12 +72,13 @@ def update_user_admin(user_id: UUID, body: dict):
     except (UserNotFound, ValueError, DataError):
         raise
     user = admin_update_user(user, body['is_superuser'])
+
     for role_name in body['roles']:
         try:
             role = get_role_by_name(role_name)
         except RoleNotFound:
             raise
         admin_update_user_roles(user, role)
+
     db.session.commit()
-
-
+    logging.info('User in db %s updated successfully', user_id)

@@ -26,6 +26,7 @@ admin_roles_bp = Blueprint('admin_roles', __name__)
 def roles_all():
     roles_db = roles_get_data()
     result = admin_role_all_schema.dump(roles_db)
+    logging.info('Data on all roles received successfully')
 
     return jsonify(result)
 
@@ -41,9 +42,9 @@ def role_create():
 
     try:
         create_role(body['name'])
-        logging.info("Role %s created successfully", body['name'])
+        logging.info('Role %s created successfully', body['name'])
     except RoleAlreadyExists as err:
-        logging.info("Role %s didn't created: role already exists", body['name'])
+        logging.info('Role creation failed: role already exists', body['name'])
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return {'message': 'Role created successfully'}, HTTPStatus.CREATED
@@ -54,9 +55,12 @@ def role_create():
 def role_info(role_id: UUID):
     try:
         role = get_role_data(role_id)
+        logging.info('Role info received successfully, role_id = %s', role_id)
     except (ValueError, DataError) as err:
+        logging.warning('Failed to get role info, role_id = %s', role_id)
         return {'message': str(err)}, HTTPStatus.BAD_REQUEST
     except RoleNotFound as err:
+        logging.warning('Role not found, role_id = %s', role_id)
         return jsonify(message=str(err)), HTTPStatus.NOT_FOUND
 
     result = admin_role_base_schema.dump(role)
@@ -75,12 +79,15 @@ def role_update(role_id: UUID):
 
     try:
         update_role(role_id, body['name'])
-        logging.info("Role %s updated successfully", body['name'])
+        logging.info('Role %s updated successfully', body['name'])
     except (ValueError, DataError) as err:
+        logging.warning('Failed to get role info, role_id = %s', role_id)
         return {'message': str(err)}, HTTPStatus.BAD_REQUEST
     except RoleNotFound as err:
+        logging.warning('Role not found, role_id = %s', role_id)
         return jsonify(message=str(err)), HTTPStatus.NOT_FOUND
     except RoleAlreadyExists as err:
+        logging.warning('Role already exist, role_id = %s', role_id)
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return {'message': 'Role updated successfully'}, HTTPStatus.CREATED
@@ -91,10 +98,12 @@ def role_update(role_id: UUID):
 def role_delete(role_id: UUID):
     try:
         delete_role(role_id)
-        logging.info("Role %s deleted successfully", role_id)
+        logging.info('Role %s deleted successfully', role_id)
     except (ValueError, DataError) as err:
-        return {"message": str(err)}, HTTPStatus.BAD_REQUEST
+        logging.warning('Role delete failed, role_id = %s', role_id)
+        return {'message': str(err)}, HTTPStatus.BAD_REQUEST
     except RoleNotFound as err:
+        logging.warning('Role not found, role_id = %s', role_id)
         return jsonify(message=str(err)), HTTPStatus.NOT_FOUND
 
     return {'message': 'Role deleted successfully'}, HTTPStatus.OK

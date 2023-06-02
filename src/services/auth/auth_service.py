@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, create_refresh_token
 
@@ -39,7 +41,9 @@ def sign_up_user(user):
     user['password'] = hash_password(user['password'])
     try:
         create_new_user(user)
+        logging.info('User in db %s created successfully', user['login'])
     except IntegrityError:
+        logging.warning('User in db %s already exists', user['login'])
         raise UserAlreadyExists(f'User with login {user["login"]} already exists')
 
 
@@ -58,6 +62,7 @@ def login_user(login: str, password: str, user_agent: str):
 
     tokens = generate_token_pair(identity=user.login)
     add_login_history_record(user_id=user.id, user_agent=user_agent)
+
     return tokens
 
 
@@ -66,5 +71,7 @@ def change_user_pw(login: str, password: str, new_password: str):
     if verify_password(password=password, hashed_password=user.password):
         user.password = hash_password(new_password)
         db.session.commit()
+        logging.info('User password in db %s updated successfully', login)
     else:
-        raise UserIncorrectPassword("Incorrect old password")
+        logging.warning('User password in db %s is incorrect', login)
+        raise UserIncorrectPassword('Incorrect old password')

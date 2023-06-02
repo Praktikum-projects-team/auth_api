@@ -29,9 +29,9 @@ def sign_up():
 
     try:
         sign_up_user(user)
-        logging.info("User with email %s successfully signed in", user['login'])
+        logging.info('User with email %s successfully signed in', user['login'])
     except UserAlreadyExists as err:
-        logging.info("User with email %s denied to sign up: user already exists", user['login'])
+        logging.info('User with email %s denied to sign up: user already exists', user['login'])
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return jsonify(msg='User created'), HTTPStatus.CREATED
@@ -48,9 +48,9 @@ def login():
 
     try:
         tokens = login_user(user['login'], user['password'], user_agent=user_agent)
-        logging.info("User with email %s successfully logged in", user['login'])
+        logging.info('User with email %s successfully logged in', user['login'])
     except UserIncorrectLoginData as err:
-        logging.info("User with email %s denied to login: incorrect login or password", user['login'])
+        logging.warning('User with email %s denied to login: incorrect login or password', user['login'])
         return jsonify(message=str(err)), HTTPStatus.UNAUTHORIZED
 
     return login_out.dump(tokens)
@@ -60,6 +60,7 @@ def login():
 @jwt_required()
 def check_access_token():
     current_user = get_jwt_identity()
+
     return jsonify(user=current_user), HTTPStatus.OK
 
 
@@ -67,9 +68,10 @@ def check_access_token():
 @jwt_required(verify_type=False)
 def logout():
     token = get_jwt()
-    token_type = token["type"]
-    logging.info(token_type)
+    token_type = token['type']
+    logging.info('Token_type: %s', token_type)
     add_token_to_block_list(token['jti'], token_type)
+
     return jsonify(msg=f'{token_type} token successfully revoked')
 
 
@@ -78,4 +80,5 @@ def logout():
 def refresh():
     identity = get_jwt_identity()
     tokens = generate_token_pair(identity)
+
     return login_out.dump(tokens)
