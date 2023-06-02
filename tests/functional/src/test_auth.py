@@ -53,8 +53,9 @@ class TestAuthSignUp:
         for _ in range(2):
             resp = make_post_request(AUTH_URL_SIGN_UP, body=user_data)
 
+        error_message = 'User with login %s already exists', user_data["login"]
         assert resp.status == HTTPStatus.CONFLICT, 'Wrong status code'
-        assert resp.body['message'] == f'User with login {user_data["login"]} already exists', 'Wrong message'
+        assert resp.body['message'] == str(error_message), 'Wrong message'
 
     @pytest.mark.parametrize('name', ['test_name', '100', '', 'кириллица', 'abcdefghijklmnopqrstuvwxyz', 'i'])
     def test_auth_sign_up_name(self, name):

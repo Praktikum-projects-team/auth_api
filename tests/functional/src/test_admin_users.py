@@ -105,6 +105,6 @@ class TestAdminUsers:
             body={'roles': roles_name, 'is_superuser': False},
             token=access_token_admin
         )
-
+        error_message = 'Role %s not found in db', roles_name[0]
         assert resp.status == HTTPStatus.NOT_FOUND, 'Wrong status code'
-        assert resp.body['message'] == f'Role {roles_name[0]} not found', 'Wrong message'
+        assert resp.body['message'] == str(error_message), 'Wrong message'

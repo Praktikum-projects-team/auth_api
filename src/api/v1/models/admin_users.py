@@ -14,7 +14,7 @@ class AdminUserInfoSchema(ma.Schema):
     id = fields.UUID(required=True)
     login = fields.String(required=True, validate=validate.Length(min=1, max=50))
     created_at = fields.DateTime(required=True)
-    name = fields.String(required=False, validate=validate.Length(min=1, max=50))
+    name = fields.String(required=False, validate=validate.Length(min=1, max=100))
     is_superuser = fields.Boolean(required=True)
     roles = fields.Nested(AdminRoleNameSchema, required=True, many=True)
 
