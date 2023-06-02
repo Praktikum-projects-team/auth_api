@@ -5,7 +5,8 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 
-from api.v1.models.users import change_login, change_password, login_history, user_change_data, user_schema
+from api.v1.models.common import paginate_in
+from api.v1.models.users import change_login, change_password, login_history_paginated, user_change_data, user_schema
 from services.auth.auth_service import UserIncorrectPassword, change_user_pw
 from services.user.user_service import user_login_history, user_get_data, user_update, user_change_login, LoginAlreadyExists
 
@@ -39,10 +40,9 @@ def update_user_info():
 @jwt_required()
 def get_login_history():
     current_user = get_jwt_identity()
-    page = request.args.get("page", 1, type=int)
-    page_size = request.args.get("page_size", 50, type=int)
-    login_history_data = user_login_history(current_user, page, page_size)
-    result = login_history.dump(login_history_data)
+    pagination = paginate_in.load(request.args)
+    login_history_data = user_login_history(current_user, pagination.get('page'), pagination.get('page_size'))
+    result = login_history_paginated.dump(login_history_data)
     return jsonify(result), HTTPStatus.OK
 
 
