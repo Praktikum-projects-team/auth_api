@@ -44,7 +44,7 @@ def user_change_login(login: str, new_data: dict):
     user = get_user_by_login(login)
     login_exists = does_user_exist(new_data['new_login'])
     if login_exists:
-        raise LoginAlreadyExists("Login already exist")
+        raise LoginAlreadyExists('Login already exist')
     user.login = new_data['new_login']
 
     db.session.commit()

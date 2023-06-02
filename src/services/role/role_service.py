@@ -44,7 +44,7 @@ def get_role_data(role_id: UUID):
 def get_role_by_name(name: str):
     role = does_role_exists(name)
     if not role:
-        raise RoleNotFound(f'Role {name} not found in db')
+        raise RoleNotFound('Role %s not found in db', name)
 
     return role
 
@@ -55,7 +55,7 @@ def update_role(role_id: UUID, name: str):
     except RoleNotFound:
         raise
     if does_role_exists(name):
-        raise RoleAlreadyExists("Role with this name already exist in db")
+        raise RoleAlreadyExists('Role with this name already exist in db')
 
     update_role_data(role, name)
     logging.info('Role in db %s updated successfully', name)

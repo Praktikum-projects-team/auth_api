@@ -44,7 +44,7 @@ def sign_up_user(user):
         logging.info('User in db %s created successfully', user['login'])
     except IntegrityError:
         logging.warning('User in db %s already exists', user['login'])
-        raise UserAlreadyExists(f'User with login {user["login"]} already exists')
+        raise UserAlreadyExists('User with login %s already exists', user["login"])
 
 
 def generate_token_pair(identity):
