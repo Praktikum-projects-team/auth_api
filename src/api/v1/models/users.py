@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate
 
+from api.v1.models.common import PaginateOut
 from api.v1.models.marshmallow_init import ma
 from db.models import LoginHistory as LoginHistoryModel
 
@@ -28,8 +29,13 @@ class LoginHistory(ma.SQLAlchemyAutoSchema):
         model = LoginHistoryModel
 
 
+class LoginHistoryPaginated(ma.Schema):
+    results = fields.Nested(LoginHistory, many=True)
+    pagination = fields.Nested(PaginateOut)
+
+
 user_schema = UsersSchema()
 user_change_data = UserChangeData()
 change_login = ChangeLogin()
 change_password = ChangePassword()
-login_history = LoginHistory(many=True)
+login_history_paginated = LoginHistoryPaginated()
