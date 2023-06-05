@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+import hashlib
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
@@ -22,6 +23,11 @@ class Role(db.Model):
 
 class User(db.Model):
     __tablename__ = 'users'
+    __table_args__ = (
+        {
+            'postgresql_partition_by': 'HASH (id)',
+        }
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     login = Column(String(50), unique=True, nullable=False)
@@ -40,6 +46,16 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.login}>'
+
+    @staticmethod
+    def hash_id(id):
+        return int(hashlib.sha256(str(id).encode('utf-8')).hexdigest(), 16)
+
+    @classmethod
+    def create(cls, login, password, name=None, is_superuser=False, roles=None):
+        user = cls(login=login, password=password, name=name, is_superuser=is_superuser, roles=roles)
+        user.id = cls.hash_id(user.id)
+        return user
 
 
 class LoginHistory(db.Model):
