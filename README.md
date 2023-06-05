@@ -19,7 +19,7 @@
 * Запуск приложения из корня проекта: `docker-compose up --build`
 * Запуск тестов из директории tests: `docker-compose up --build`
 * Создание суперпользователя: `python src/create_superuser.py [superuser_login] [superuser_password]`
-* Генерация новой миграции: `flask db migrate -m "краткое описание вашей миграции"`
+* Генерация новой миграции из директории src (предварительно поменять в .env DB_HOST на 0.0.0.0): `flask db migrate -m "краткое описание вашей миграции"`
 
 ## Структура проекта
 * src - код сервиса
