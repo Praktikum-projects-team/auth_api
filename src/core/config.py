@@ -20,6 +20,7 @@ pg_conf = PostgresConfig()
 
 
 class AppConfig(BaseSettings):
+    SECRET_KEY: str = Field(..., env='SECRET_KEY')
     SQLALCHEMY_DATABASE_URI: PostgresDsn =\
         f'postgresql://{pg_conf.user}:{pg_conf.password}@{pg_conf.host}:{pg_conf.port}/{pg_conf.database}'  # .build(..)
     JWT_SECRET_KEY: str = Field(..., env='JWT_SECRET_KEY')
