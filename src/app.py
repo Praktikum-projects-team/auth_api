@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, url_for, redirect, session, Blueprint
 from flask_migrate import upgrade
+import os
 
 from api.v1.admin_roles import admin_roles_bp
 from api.v1.admin_users import admin_users_bp
@@ -10,10 +11,12 @@ from core.config import app_config
 from db.alembic_migrate_init import init_migration_tool
 from db.pg_db import db, init_db
 from services.auth.jwt_init import init_jwt
+from api.v1.providers import OAuth, oauth_bp, create_oauth
 
 
 def register_blueprints(app):
     API_V1_PATH = '/api/v1'
+    app.register_blueprint(oauth_bp, url_prefix=API_V1_PATH + '/login/google')
     app.register_blueprint(auth_bp, url_prefix=API_V1_PATH + '/auth')
     app.register_blueprint(admin_roles_bp, url_prefix=API_V1_PATH + '/admin/roles')
     app.register_blueprint(users_bp, url_prefix=API_V1_PATH + '/user')
@@ -27,10 +30,29 @@ def init_extensions(app):
     init_marshmallow(app=app)
 
 
+# def create_oauth(app):
+#     OAuth.init_app(app=app)
+#     OAuth.register(
+#         name='google',
+#         client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+#         client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+#         access_token_url='https://accounts.google.com/o/oauth2/token',
+#         access_token_params=None,
+#         authorize_url='https://accounts.google.com/o/oauth2/auth',
+#         authorize_params=None,
+#         api_base_url='https://www.googleapis.com/oauth2/v1/',
+#         userinfo_endpoint='https://openidconnect.googleapis.com/v1/userinfo',
+#         server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+#         client_kwargs={'scope': 'email'},
+#     )
+
+
 def create_app():
     app = Flask(__name__)
+    app.secret_key = 'very secret key'
     app.config.from_object(app_config)
     init_extensions(app)
+    create_oauth(app)
     register_blueprints(app)
     with app.app_context():
         upgrade()
