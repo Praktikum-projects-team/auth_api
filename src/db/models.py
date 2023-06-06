@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 
+from constants import NUM_PARTITIONS
 from db.pg_db import db
 
 
@@ -36,33 +37,21 @@ class User(db.Model):
     name = Column(String(100), nullable=True)
     is_superuser = Column(Boolean, default=False)
     roles = db.relationship(Role, secondary='user_roles')
-    partition_id = Column(UUID(as_uuid=True), ForeignKey('users_partitions.id'))
+    partition_id = Column(
+        Integer,
+        default=(int(hashlib.sha256(str(id).encode('utf-8')).hexdigest(), 16) % NUM_PARTITIONS),
+        nullable=False
+    )
 
-    def __init__(self, login, password, name=None, is_superuser=False, roles=None, partition_id=None):
+    def __init__(self, login, password, name=None, is_superuser=False, roles=None):
         self.login = login
         self.password = password
         self.name = name
         self.is_superuser = is_superuser
         self.roles = roles or []
-        self.partition_id = partition_id
 
     def __repr__(self):
         return f'<User {self.login}>'
-
-    @staticmethod
-    def hash_id(id):
-        return int(hashlib.sha256(str(id).encode('utf-8')).hexdigest(), 16)
-
-
-class UserPartition(db.Model):
-    __tablename__ = 'users_partitions'
-
-    id = Column(UUID(as_uuid=True), primary_key=True)
-    partition_id = Column(Integer, nullable=False)
-    users = db.relationship('User', backref='partition', lazy='dynamic')
-
-    def __init__(self, partition_id):
-        self.partition_id = partition_id
 
 
 class LoginHistory(db.Model):
