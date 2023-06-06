@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from constants import RoleName
-from db.models import Role, User, LoginHistory, UserRole
+from constants import NUM_PARTITIONS, RoleName
+from db.models import Role, User, LoginHistory, UserPartition, UserRole
 from db.pg_db import db
 
 
@@ -17,6 +17,11 @@ def create_new_user(user):
     role = db.session.query(Role).filter(Role.name == RoleName.USER).first()
     new_user = User(**user, roles=[role])
     db.session.add(new_user)
+    db.session.commit()
+
+    partition_id = User.hash_id(new_user.id) % NUM_PARTITIONS
+    partition = UserPartition(partition_id=partition_id, id=new_user.id)
+    db.session.add(partition)
     db.session.commit()
 
 

@@ -46,7 +46,6 @@ def get_paginated(paginated_obj: Pagination):
     }
 
 
-
 def user_update(login: str, new_data: dict):
     user = get_user_by_login(login)
     user.name = new_data['name']
