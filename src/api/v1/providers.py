@@ -1,12 +1,22 @@
 from __future__ import annotations
 import os
+from http import HTTPStatus
+from typing import Any
+
+import requests
+from pydantic import BaseModel
 
 from authlib.integrations.flask_client import OAuth as OAuthClient
-from flask import Blueprint, url_for, session, redirect
+from flask import Blueprint, url_for, session, redirect, Response
 
 OAuth = OAuthClient()
 
-oauth_bp = Blueprint("google", __name__)
+oauth_sign_up_bp = Blueprint("google", __name__)
+
+
+class ApiResponse(BaseModel):
+    status: HTTPStatus
+    body: Any
 
 
 def create_oauth(app):
@@ -26,20 +36,22 @@ def create_oauth(app):
     )
 
 
-@oauth_bp.route('/hello-world')
+@oauth_sign_up_bp.route('/hello-world')
 def hello_world():
-    email = dict(session)['profile']['email']
-    return f'Users email: {email}!'
+    params = {'login': dict(session)['profile']['email'], 'password': '123qwe'}
+    resp = requests.post(url='http://localhost:5000/api/v1/auth/sign_up', json=params,
+                         headers={'Content-Type': 'application'})
+    return HTTPStatus.OK
 
 
-@oauth_bp.route('/', methods=['GET'])
+@oauth_sign_up_bp.route('/', methods=['GET'])
 def login():
     google = OAuth.create_client('google')
     redirect_uri = url_for('google.authorize', _external=True)
     return google.authorize_redirect(redirect_uri)
 
 
-@oauth_bp.route('/authorize')
+@oauth_sign_up_bp.route('/authorize')
 def authorize():
     google = OAuth.create_client('google')
     token = google.authorize_access_token()
@@ -48,7 +60,13 @@ def authorize():
     user = OAuth.google.userinfo()
     session['profile'] = user_info
     session.permanent = True
-    return redirect('/api/v1/login/google/hello-world')
-
-
-
+    # params = {'login': dict(session)['profile']['email'], 'password': '123qwe'}
+    # getattr(requests, "post")('https://localhost:8000/api/v1/auth/sign_up', params=None, json=dict(params))
+    # , headers={'Content-Type: application/json'})
+    # return resp.status_code
+    # json_params = json.dumps(params)
+    # redirect_uri = url_for('auth.sign_up', _external=True)
+    # redir = redirect(redirect_uri)
+    # redir.data = json_params
+    # return redir
+    return redirect('/api/v1/auth/sign_up/google/hello-world')

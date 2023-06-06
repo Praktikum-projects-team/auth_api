@@ -10,12 +10,12 @@ from core.config import app_config
 from db.alembic_migrate_init import init_migration_tool
 from db.pg_db import db, init_db
 from services.auth.jwt_init import init_jwt
-from api.v1.providers import oauth_bp, create_oauth
+from api.v1.providers import oauth_sign_up_bp, create_oauth
 
 
 def register_blueprints(app):
     API_V1_PATH = '/api/v1'
-    app.register_blueprint(oauth_bp, url_prefix=API_V1_PATH + '/login/google')
+    app.register_blueprint(oauth_sign_up_bp, url_prefix=API_V1_PATH + '/auth/sign_up/google')
     app.register_blueprint(auth_bp, url_prefix=API_V1_PATH + '/auth')
     app.register_blueprint(admin_roles_bp, url_prefix=API_V1_PATH + '/admin/roles')
     app.register_blueprint(users_bp, url_prefix=API_V1_PATH + '/user')
