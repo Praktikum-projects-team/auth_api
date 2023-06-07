@@ -3,4 +3,4 @@ class RoleName:
     USER = "user"
 
 
-NUM_PARTITIONS = 10
+NUM_PARTITIONS = 3

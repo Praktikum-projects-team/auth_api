@@ -1,8 +1,8 @@
 """add partitioning users table
 
-Revision ID: 5bc2f89ef591
+Revision ID: a4fb905581cb
 Revises: 24ec1405a840
-Create Date: 2023-06-06 14:09:36.576210
+Create Date: 2023-06-07 17:09:34.491522
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5bc2f89ef591'
+revision = 'a4fb905581cb'
 down_revision = '24ec1405a840'
 branch_labels = None
 depends_on = None
@@ -29,26 +29,31 @@ def upgrade():
         batch_op.create_unique_constraint(None, ['id'])
 
     op.execute("""
-        CREATE TABLE users_partitions (
-        CHECK (partition_id >= 0 AND partition_id < 10)
-        ) INHERITS (users);
-        """)
+        CREATE TABLE users_partitions_0 (CHECK (partition_id = 0)) INHERITS (users);
+        CREATE TABLE users_partitions_1 (CHECK (partition_id = 1)) INHERITS (users);
+        CREATE TABLE users_partitions_2 (CHECK (partition_id = 2)) INHERITS (users);
+    """)
 
     op.execute("""
-        CREATE OR REPLACE FUNCTION users_insert_trigger() 
-        RETURNS TRIGGER AS $$ 
-        BEGIN 
-        INSERT INTO users_partitions VALUES (NEW.*);
-        RETURN NULL; 
-        END; $$ 
+        CREATE OR REPLACE FUNCTION users_insert_trigger()
+        RETURNS TRIGGER AS $$
+        BEGIN
+        IF NEW.partition_id = 0 THEN INSERT INTO users_partitions_0 VALUES (NEW.*);
+        ELSEIF NEW.partition_id = 1 THEN INSERT INTO users_partitions_1 VALUES (NEW.*);
+        ELSEIF NEW.partition_id = 2 THEN INSERT INTO users_partitions_2 VALUES (NEW.*);
+        END IF;
+        RETURN NULL;
+        END; $$
         LANGUAGE plpgsql;
-        """)
+    """)
+
+    op.execute("""DROP TRIGGER IF EXISTS users_insert ON users;""")
 
     op.execute("""
         CREATE TRIGGER insert_users_trigger 
         BEFORE INSERT ON users 
         FOR EACH ROW EXECUTE FUNCTION users_insert_trigger();
-        """)
+    """)
 
     # ### end Alembic commands ###
 
