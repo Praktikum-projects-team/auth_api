@@ -1,12 +1,9 @@
-import hashlib
 import uuid
 from datetime import datetime
 
-from alembic import op
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 
-from constants import NUM_PARTITIONS
 from db.pg_db import db
 
 
