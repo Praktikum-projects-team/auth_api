@@ -2,6 +2,7 @@ import hashlib
 import uuid
 from datetime import datetime
 
+from alembic import op
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -24,11 +25,6 @@ class Role(db.Model):
 
 class User(db.Model):
     __tablename__ = 'users'
-    __table_args__ = (
-        {
-            'postgresql_partition_by': 'HASH (id)',
-        }
-    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     login = Column(String(50), unique=True, nullable=False)
@@ -37,11 +33,6 @@ class User(db.Model):
     name = Column(String(100), nullable=True)
     is_superuser = Column(Boolean, default=False)
     roles = db.relationship(Role, secondary='user_roles')
-    partition_id = Column(
-        Integer,
-        default=(int(hashlib.sha256(str(id).encode('utf-8')).hexdigest(), 16) % NUM_PARTITIONS),
-        nullable=False
-    )
 
     def __init__(self, login, password, name=None, is_superuser=False, roles=None):
         self.login = login
@@ -56,6 +47,11 @@ class User(db.Model):
 
 class LoginHistory(db.Model):
     __tablename__ = 'login_history'
+    __table_args__ = (
+        {
+            'postgresql_partition_by': 'auth_datetime',
+        }
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey(User.id), nullable=False)
