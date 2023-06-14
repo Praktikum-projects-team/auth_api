@@ -2,6 +2,11 @@ import datetime
 from pydantic import BaseSettings, Field, PostgresDsn, validator
 
 
+class JaegerConfig(BaseSettings):
+    host: str = Field(..., env='JAEGER_HOST')
+    port: int = Field(..., env='JAEGER_PORT')
+
+
 class RedisConfig(BaseSettings):
     host: str = Field(..., env='REDIS_HOST')
     port: int = Field(..., env='REDIS_PORT')
@@ -37,3 +42,4 @@ class AppConfig(BaseSettings):
 
 
 app_config = AppConfig()
+jaeger_config = JaegerConfig()

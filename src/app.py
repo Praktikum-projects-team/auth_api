@@ -1,12 +1,17 @@
-from flask import Flask
+from flask import Flask, request
 from flask_migrate import upgrade
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 
 from api.v1.admin_roles import admin_roles_bp
 from api.v1.admin_users import admin_users_bp
 from api.v1.auth import auth_bp
 from api.v1.users import users_bp
 from api.v1.models.marshmallow_init import init_marshmallow
-from core.config import app_config
+from core.config import app_config, jaeger_config
 from db.alembic_migrate_init import init_migration_tool
 from db.pg_db import db, init_db
 from services.auth.jwt_init import init_jwt
@@ -27,8 +32,25 @@ def init_extensions(app):
     init_marshmallow(app=app)
 
 
+def configure_tracer() -> None:
+    trace.set_tracer_provider(TracerProvider())
+    trace.get_tracer_provider().add_span_processor(
+        BatchSpanProcessor(
+            JaegerExporter(
+                agent_host_name=jaeger_config.host,
+                agent_port=jaeger_config.port,
+            )
+        )
+    )
+    trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
+
+
+configure_tracer()
+
+
 def create_app():
     app = Flask(__name__)
+    FlaskInstrumentor().instrument_app(app)
     app.config.from_object(app_config)
     init_extensions(app)
     register_blueprints(app)
@@ -38,3 +60,10 @@ def create_app():
 
 
 app = create_app()
+
+
+@app.before_request
+def before_request():
+    request_id = request.headers.get('X-Request-Id')
+    if not request_id:
+        raise RuntimeError('request id is required')
