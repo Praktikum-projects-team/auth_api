@@ -15,7 +15,6 @@ from services.auth.auth_service import (
     generate_token_pair
 )
 
-
 auth_bp = Blueprint('auth', __name__)
 
 
