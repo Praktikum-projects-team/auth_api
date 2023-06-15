@@ -27,7 +27,6 @@ def upgrade():
     with op.batch_alter_table('users', schema=None) as batch_op:
         batch_op.create_unique_constraint(None, ['id'])
 
-    # Create partitioning login_history table
     op.execute(
         sa.text(
             "CREATE TABLE login_history_new ("
@@ -40,7 +39,6 @@ def upgrade():
         )
     )
 
-    # Create partitioning login_history table
     for i in range(1, 13):
         year = '2023'
         month = str(i).zfill(2)
@@ -59,19 +57,20 @@ def upgrade():
                 f"FOR VALUES FROM ('{start_date}') TO ('{end_date}')"
             )
         )
+        op.execute(
+            sa.text(
+                f"CREATE INDEX {table_name}_user_id_idx ON {table_name} (user_id)"
+            )
+        )
 
-    # Copy data from login_history to login_history_new
     op.execute(
         sa.text(
             "INSERT INTO login_history_new (id, user_id, user_agent, auth_datetime) "
             "SELECT id, user_id, user_agent, auth_datetime FROM login_history"
         )
     )
-    # Drop login_history
     op.drop_table('login_history')
-    # Rename login_history_new to login_history
     op.rename_table('login_history_new', 'login_history')
-    # Create index for partitioning
     op.create_index('idx_login_history_auth_datetime', 'login_history', ['auth_datetime'])
 
     # ### end Alembic commands ###
