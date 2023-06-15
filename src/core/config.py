@@ -10,9 +10,9 @@ class RedisConfig(BaseSettings):
 class PostgresConfig(BaseSettings):
     host: str = Field(..., env='DB_HOST')
     port: int = Field(..., env='DB_PORT')
-    user: str = Field(..., env='DB_USER')
-    password: str = Field(..., env='DB_PASSWORD')
-    database: str = Field(..., env='DB_NAME')
+    user: str = Field(..., env='POSTGRES_USER')
+    password: str = Field(..., env='POSTGRES_PASSWORD')
+    database: str = Field(..., env='POSTGRES_DB')
     host_local: str = Field(..., env='DB_HOST_LOCAL')
 
 

@@ -59,9 +59,8 @@ def login():
 @auth_bp.route('/check_access_token', methods=['POST'])
 @jwt_required()
 def check_access_token():
-    current_user = get_jwt_identity()
-
-    return jsonify(user=current_user), HTTPStatus.OK
+    current_user = get_jwt().get('user_info')
+    return jsonify(current_user), HTTPStatus.OK
 
 
 @auth_bp.route('/logout', methods=['POST'])
