@@ -1,5 +1,5 @@
 import datetime
-from pydantic import BaseSettings, Field, PostgresDsn, validator
+from pydantic import BaseSettings, Field, PostgresDsn, RedisDsn, validator
 
 
 class RedisConfig(BaseSettings):
@@ -27,10 +27,10 @@ class AppConfig(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRES: datetime.timedelta = Field(..., env='ACCESS_TOKEN_TTL_IN_MINUTES')
     JWT_REFRESH_TOKEN_EXPIRES: datetime.timedelta = Field(..., env='REFRESH_TOKEN_TTL_IN_DAYS')
 
-    RATELIMIT_STORAGE_URL = f'redis://{redis_conf.host}:{redis_conf.port}/0'
-    RATELIMIT_STRATEGY = 'fixed-window'
-    RATELIMIT_HEADERS_ENABLED = True
-    RATELIMIT_DEFAULT = '20/minute'
+    RATELIMIT_STORAGE_URL: RedisDsn = f'redis://{redis_conf.host}:{redis_conf.port}/0'
+    RATELIMIT_STRATEGY: str = 'fixed-window'
+    RATELIMIT_HEADERS_ENABLED: bool = True
+    RATELIMIT_DEFAULT: str = '20/minute'
 
     @validator('JWT_ACCESS_TOKEN_EXPIRES', pre=True)
     def set_datetime_unit_minutes(cls, val):

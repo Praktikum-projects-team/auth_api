@@ -27,14 +27,14 @@ def init_extensions(app):
     init_db(app=app)
     init_migration_tool(app=app, db=db)
     init_marshmallow(app=app)
+    limiter = Limiter(key_func=get_remote_address)
+    limiter.init_app(app)
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(app_config)
     init_extensions(app)
-    limiter = Limiter(key_func=get_remote_address)
-    limiter.init_app(app)
     register_blueprints(app)
     with app.app_context():
         upgrade()
