@@ -38,6 +38,8 @@ class AppConfig(BaseSettings):
     RATELIMIT_HEADERS_ENABLED: bool = True
     RATELIMIT_DEFAULT: str = '20/minute'
 
+    enable_tracer: bool = True
+
     @validator('JWT_ACCESS_TOKEN_EXPIRES', pre=True)
     def set_datetime_unit_minutes(cls, val):
         num_val = float(val)

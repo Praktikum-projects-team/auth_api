@@ -11,7 +11,6 @@ class TestSettings(BaseSettings):
     user_db: str = Field(..., env='POSTGRES_USER')
     password_db: str = Field(..., env='POSTGRES_PASSWORD')
     name_db: str = Field(..., env='POSTGRES_DB')
-    # host_db_local: str = Field(..., env='DB_HOST_LOCAL')
 
     host_api: str = Field(..., env='API_HOST')
     port_api: int = Field(..., env='API_PORT')

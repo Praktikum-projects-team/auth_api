@@ -9,7 +9,7 @@ from db.queries.user import get_user_by_login
 from flask import url_for, session, request
 from services.auth.auth_service import sign_up_user, generate_token_pair, add_login_history_record
 from core.config import oauth_config
-from api.v1.models.auth import login_out, login_in_oauth
+from api.v1.models.auth import login_in_oauth
 
 
 def oauth_user_login(user, user_agent):

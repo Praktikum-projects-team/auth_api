@@ -1,12 +1,15 @@
 import os
 from http import HTTPStatus
 
-from flask import Blueprint, url_for, jsonify, session, redirect
+from flask import Blueprint, jsonify, redirect, session, url_for
 from marshmallow import ValidationError
 
-from api.v1.models.auth import login_out, login_in_oauth
-from services.oauth.oauth_service import oauth_user, get_authorization_url, credentials_to_dict, \
-    set_google_oauth_credentials, authorize_user_with_google
+from api.v1.models.auth import login_out
+from services.oauth.oauth_service import (
+    authorize_user_with_google,
+    get_authorization_url,
+    set_google_oauth_credentials
+)
 
 CLIENT_SECRETS_FILE = os.path.abspath(os.path.dirname(__file__)) + '/client_secret.json'
 
