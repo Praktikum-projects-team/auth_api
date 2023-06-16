@@ -51,6 +51,7 @@ class AppConfig(BaseSettings):
 app_config = AppConfig()
 jaeger_config = JaegerConfig()
 
+
 class OauthConfig(BaseSettings):
     OAUTHLIB_INSECURE_TRANSPORT: int = Field(..., env='OAUTHLIB_INSECURE_TRANSPORT')
     OAUTHLIB_RELAX_TOKEN_SCOPE: int = Field(..., env='OAUTHLIB_RELAX_TOKEN_SCOPE')
