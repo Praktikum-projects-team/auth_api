@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 
 from db.pg_db import db
@@ -69,3 +69,12 @@ class UserRole(db.Model):
     user_id = Column(UUID(as_uuid=True), ForeignKey(User.id), primary_key=True, nullable=False)
     role_id = Column(UUID(as_uuid=True), ForeignKey(Role.id, ondelete='CASCADE'), primary_key=True, nullable=False)
     given_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+
+class OauthAccounts(db.Model):
+    __tablename__ = 'oauth_accounts'
+
+    user_id = Column(UUID(as_uuid=True), ForeignKey(User.id), primary_key=True, nullable=False)
+    oauth_id = Column(Text, primary_key=True, nullable=False)
+    provider = Column(String(100), nullable=False)
+    oauth_email = Column(String(50), nullable=False)
