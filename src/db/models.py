@@ -44,10 +44,15 @@ class User(db.Model):
 
 class LoginHistory(db.Model):
     __tablename__ = 'login_history'
+    __table_args__ = (
+        {
+            'postgresql_partition_by': 'auth_datetime',
+        }
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey(User.id), nullable=False)
-    user_agent = Column(String(50), nullable=False)
+    user_agent = Column(String(150), nullable=False)
     auth_datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, user_id, user_agent):

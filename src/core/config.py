@@ -1,5 +1,10 @@
 import datetime
-from pydantic import BaseSettings, Field, PostgresDsn, validator
+from pydantic import BaseSettings, Field, PostgresDsn, RedisDsn, validator
+
+
+class JaegerConfig(BaseSettings):
+    host: str = Field(..., env='JAEGER_HOST')
+    port: int = Field(..., env='JAEGER_PORT')
 
 
 class RedisConfig(BaseSettings):
@@ -10,13 +15,14 @@ class RedisConfig(BaseSettings):
 class PostgresConfig(BaseSettings):
     host: str = Field(..., env='DB_HOST')
     port: int = Field(..., env='DB_PORT')
-    user: str = Field(..., env='DB_USER')
-    password: str = Field(..., env='DB_PASSWORD')
-    database: str = Field(..., env='DB_NAME')
+    user: str = Field(..., env='POSTGRES_USER')
+    password: str = Field(..., env='POSTGRES_PASSWORD')
+    database: str = Field(..., env='POSTGRES_DB')
     host_local: str = Field(..., env='DB_HOST_LOCAL')
 
 
 pg_conf = PostgresConfig()
+redis_conf = RedisConfig()
 
 
 class AppConfig(BaseSettings):
@@ -26,6 +32,11 @@ class AppConfig(BaseSettings):
     JWT_SECRET_KEY: str = Field(..., env='JWT_SECRET_KEY')
     JWT_ACCESS_TOKEN_EXPIRES: datetime.timedelta = Field(..., env='ACCESS_TOKEN_TTL_IN_MINUTES')
     JWT_REFRESH_TOKEN_EXPIRES: datetime.timedelta = Field(..., env='REFRESH_TOKEN_TTL_IN_DAYS')
+
+    RATELIMIT_STORAGE_URL: RedisDsn = f'redis://{redis_conf.host}:{redis_conf.port}/0'
+    RATELIMIT_STRATEGY: str = 'fixed-window'
+    RATELIMIT_HEADERS_ENABLED: bool = True
+    RATELIMIT_DEFAULT: str = '20/minute'
 
     @validator('JWT_ACCESS_TOKEN_EXPIRES', pre=True)
     def set_datetime_unit_minutes(cls, val):
@@ -38,7 +49,7 @@ class AppConfig(BaseSettings):
 
 
 app_config = AppConfig()
-
+jaeger_config = JaegerConfig()
 
 class OauthConfig(BaseSettings):
     OAUTHLIB_INSECURE_TRANSPORT: int = Field(..., env='OAUTHLIB_INSECURE_TRANSPORT')

@@ -40,7 +40,7 @@ class TestUser:
 
         assert resp.status == HTTPStatus.OK, 'Wrong status code'
         for field in expected_fields:
-            assert field in resp.body[0], f'No {field} in resp'
+            assert field in resp.body['results'][0], f'No {field} in resp'
 
     def test_user_change_login(self, user_data_with_tokens):
         """Checking updating user login"""

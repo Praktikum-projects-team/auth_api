@@ -1,8 +1,5 @@
 from marshmallow import Schema, fields, validate
 
-from api.v1.models.marshmallow_init import ma
-from db.models import LoginHistory as LoginHistoryModel
-
 
 class PaginateIn(Schema):
     page = fields.Int(validate=validate.Range(min=1, error='page must be positive number'), default=1)
