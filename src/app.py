@@ -14,10 +14,12 @@ from core.tracing import configure_tracer
 from db.alembic_migrate_init import init_migration_tool
 from db.pg_db import db, init_db
 from services.auth.jwt_init import init_jwt
+from api.v1.oauth import oauth_bp
 
 
 def register_blueprints(app):
     API_V1_PATH = '/api/v1'
+    app.register_blueprint(oauth_bp, url_prefix=API_V1_PATH + '/oauth')
     app.register_blueprint(auth_bp, url_prefix=API_V1_PATH + '/auth')
     app.register_blueprint(admin_roles_bp, url_prefix=API_V1_PATH + '/admin/roles')
     app.register_blueprint(users_bp, url_prefix=API_V1_PATH + '/user')

@@ -26,7 +26,8 @@ redis_conf = RedisConfig()
 
 
 class AppConfig(BaseSettings):
-    SQLALCHEMY_DATABASE_URI: PostgresDsn =\
+    SECRET_KEY: str = Field(..., env='SECRET_KEY')
+    SQLALCHEMY_DATABASE_URI: PostgresDsn = \
         f'postgresql://{pg_conf.user}:{pg_conf.password}@{pg_conf.host}:{pg_conf.port}/{pg_conf.database}'  # .build(..)
     JWT_SECRET_KEY: str = Field(..., env='JWT_SECRET_KEY')
     JWT_ACCESS_TOKEN_EXPIRES: datetime.timedelta = Field(..., env='ACCESS_TOKEN_TTL_IN_MINUTES')
@@ -49,3 +50,14 @@ class AppConfig(BaseSettings):
 
 app_config = AppConfig()
 jaeger_config = JaegerConfig()
+
+
+class OauthConfig(BaseSettings):
+    OAUTHLIB_INSECURE_TRANSPORT: int = Field(..., env='OAUTHLIB_INSECURE_TRANSPORT')
+    OAUTHLIB_RELAX_TOKEN_SCOPE: int = Field(..., env='OAUTHLIB_RELAX_TOKEN_SCOPE')
+    API_SERVICE_NAME: str = Field(..., env='API_SERVICE_NAME')
+    API_VERSION: str = Field(..., env='API_VERSION')
+    SCOPES: str = Field(..., env='SCOPES')
+
+
+oauth_config = OauthConfig()
