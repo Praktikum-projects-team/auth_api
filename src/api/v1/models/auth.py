@@ -15,6 +15,12 @@ class LoginOut(Schema):
     refresh_token = fields.Str(required=True)
 
 
+class LoginInOauth(Schema):
+    login = fields.Email(required=True)
+    password = fields.Str(validate=validate.Length(max=50))
+
+
 login_in = LoginIn()
 login_out = LoginOut()
 sign_up_in = SignUpIn()
+login_in_oauth = LoginInOauth()
