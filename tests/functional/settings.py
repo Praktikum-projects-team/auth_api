@@ -8,9 +8,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class TestSettings(BaseSettings):
     host_db: str = Field(..., env='DB_HOST')
     port_db: int = Field(..., env='DB_PORT')
-    user_db: str = Field(..., env='DB_USER')
-    password_db: str = Field(..., env='DB_PASSWORD')
-    name_db: str = Field(..., env='DB_NAME')
+    user_db: str = Field(..., env='POSTGRES_USER')
+    password_db: str = Field(..., env='POSTGRES_PASSWORD')
+    name_db: str = Field(..., env='POSTGRES_DB')
     # host_db_local: str = Field(..., env='DB_HOST_LOCAL')
 
     host_api: str = Field(..., env='API_HOST')

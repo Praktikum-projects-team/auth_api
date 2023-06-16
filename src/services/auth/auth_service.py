@@ -1,5 +1,6 @@
 import logging
 
+import json
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, create_refresh_token
 
@@ -32,9 +33,16 @@ def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
     return token_in_redis is not None
 
 
-def add_token_to_block_list(jti, token_type):
-    ttl = app_config.JWT_ACCESS_TOKEN_EXPIRES if token_type == 'access' else app_config.JWT_REFRESH_TOKEN_EXPIRES
-    jwt_redis_blocklist.set(jti, "", ex=ttl)
+@jwt.additional_claims_loader
+def user_claims_to_access_token(user_login):
+    user = get_user_by_login(user_login)
+    user_roles = [r.name for r in user.roles]
+    user_claim = {
+        'name': user.name,
+        'is_superuser': user.is_superuser,
+        'roles': user_roles,
+    }
+    return {'user_info': json.dumps(user_claim)}
 
 
 def sign_up_user(user):
@@ -45,6 +53,11 @@ def sign_up_user(user):
     except IntegrityError:
         logging.warning('User in db %s already exists', user['login'])
         raise UserAlreadyExists('User with login %s already exists', user["login"])
+
+
+def add_token_to_block_list(jti, token_type):
+    ttl = app_config.JWT_ACCESS_TOKEN_EXPIRES if token_type == 'access' else app_config.JWT_REFRESH_TOKEN_EXPIRES
+    jwt_redis_blocklist.set(jti, "", ex=ttl)
 
 
 def generate_token_pair(identity):
