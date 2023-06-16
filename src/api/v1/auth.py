@@ -1,7 +1,7 @@
 import logging
 from http import HTTPStatus
 
-from flask import jsonify, request, Blueprint, session
+from flask import jsonify, request, Blueprint
 from flask_jwt_extended import get_jwt_identity, get_jwt, jwt_required
 from marshmallow import ValidationError
 
@@ -21,11 +21,7 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/sign_up', methods=['POST'])
 def sign_up():
-    logging.info('Start sign up')
     json_data = request.get_json()
-    if not json_data['login']:
-        json_data = session['login_data']
-        logging.info('login from session')
     try:
         user = sign_up_in.load(json_data)
     except ValidationError as err:
