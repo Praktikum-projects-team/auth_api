@@ -1,4 +1,6 @@
 from flask import Flask, request
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_migrate import upgrade
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 
@@ -27,10 +29,15 @@ def init_extensions(app):
     init_db(app=app)
     init_migration_tool(app=app, db=db)
     init_marshmallow(app=app)
+    
+    limiter = Limiter(key_func=get_remote_address)
+    limiter.init_app(app)
+    
     FlaskInstrumentor().instrument_app(app)
 
 
 configure_tracer()
+
 
 
 def create_app():
