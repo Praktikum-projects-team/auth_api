@@ -1,4 +1,6 @@
 from flask import Flask
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_migrate import upgrade
 
 from api.v1.admin_roles import admin_roles_bp
@@ -25,6 +27,8 @@ def init_extensions(app):
     init_db(app=app)
     init_migration_tool(app=app, db=db)
     init_marshmallow(app=app)
+    limiter = Limiter(key_func=get_remote_address)
+    limiter.init_app(app)
 
 
 def create_app():
