@@ -1,14 +1,12 @@
 import logging
 import secrets
-from http import HTTPStatus
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 
 from db.queries.user import get_user_by_login
-from flask import url_for, session, request, redirect, jsonify
-from marshmallow import ValidationError
+from flask import url_for, session, request
 from services.auth.auth_service import sign_up_user, generate_token_pair, add_login_history_record
 from core.config import oauth_config
 from api.v1.models.auth import login_out, login_in_oauth
@@ -58,8 +56,6 @@ def set_google_oauth_credentials(client_secret):
 
 
 def authorize_user_with_google():
-    if 'credentials' not in session:
-        return redirect(url_for('oauth_bp.authorize'))
     credentials = google.oauth2.credentials.Credentials(
         **session['credentials'])
     person_data = googleapiclient.discovery.build(
