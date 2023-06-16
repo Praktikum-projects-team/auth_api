@@ -18,6 +18,7 @@ def create_new_user(user):
     new_user = User(**user, roles=[role])
     db.session.add(new_user)
     db.session.commit()
+    return user
 
 
 def add_login_history_record(user_id: UUID, user_agent: str):

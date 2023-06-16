@@ -45,11 +45,12 @@ def user_claims_to_access_token(user_login):
     return {'user_info': json.dumps(user_claim)}
 
 
-def sign_up_user(user):
+def sign_up_user(user: dict):
     user['password'] = hash_password(user['password'])
     try:
-        create_new_user(user)
+        created_user = create_new_user(user)
         logging.info('User in db %s created successfully', user['login'])
+        return created_user
     except IntegrityError:
         logging.warning('User in db %s already exists', user['login'])
         raise UserAlreadyExists('User with login %s already exists', user["login"])
