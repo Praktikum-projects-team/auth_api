@@ -1,19 +1,11 @@
-import os
-from http import HTTPStatus
-
-from flask import Blueprint, url_for, jsonify, session, redirect
-from marshmallow import ValidationError
+from flask import Blueprint, url_for
 
 from api.v1.models.auth import login_out
 from core.oauth_init import oauth
 from services.auth.oauth import login_by_oauth, get_oauth_user
-from services.oauth.oauth_service import get_authorization_url, \
-    set_google_oauth_credentials, authorize_user_with_google
 
-CLIENT_SECRETS_FILE = os.path.abspath(os.path.dirname(__file__)) + '/client_secret.json'
 
 oauth_bp = Blueprint("oauth_bp", __name__)
-
 
 
 @oauth_bp.route('/<provider>/authorize')
@@ -23,7 +15,7 @@ def login(provider: str):
 
 
 @oauth_bp.route('/<provider>/oauth2callback')
-def authorize(provider):
+def authorize(provider: str):
     token = oauth.google.authorize_access_token()
     # resp = oauth.google.get('userinfo', token=token)
     # user_info = resp.json()
