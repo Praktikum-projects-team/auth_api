@@ -93,16 +93,6 @@ def downgrade():
     )
     op.drop_table('login_history_new')
 
-    for i in range(1, 13):
-        year = '2023'
-        month = str(i).zfill(2)
-        table_name = f'login_history_y{year}m{month}'
-        op.execute(
-            sa.text(
-                f"DROP INDEX {table_name}_user_id_idx"
-            )
-        )
-
     with op.batch_alter_table('login_history', schema=None) as batch_op:
         batch_op.dropconstraint(None, type='unique')
 
