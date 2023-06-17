@@ -75,6 +75,5 @@ class OauthAccounts(db.Model):
     __tablename__ = 'oauth_accounts'
 
     user_id = Column(UUID(as_uuid=True), ForeignKey(User.id), primary_key=True, nullable=False)
-    oauth_id = Column(Text, primary_key=True, nullable=False)
-    provider = Column(String(100), nullable=False)
-    oauth_email = Column(String(50), nullable=False)
+    oauth_user_login = Column(Text, nullable=False)
+    provider = Column(String(100), primary_key=True, nullable=False)
