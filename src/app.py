@@ -11,6 +11,7 @@ from api.v1.models.marshmallow_init import init_marshmallow
 from api.v1.oauth import oauth_bp
 from api.v1.users import users_bp
 from core.config import app_config
+from core.oauth_init import init_oauth
 from core.tracing import configure_tracer
 from db.alembic_migrate_init import init_migration_tool
 from db.pg_db import db, init_db
@@ -31,6 +32,7 @@ def init_extensions(app):
     init_db(app=app)
     init_migration_tool(app=app, db=db)
     init_marshmallow(app=app)
+    init_oauth(app)
     limiter = Limiter(key_func=get_remote_address)
     limiter.init_app(app)
     FlaskInstrumentor().instrument_app(app)

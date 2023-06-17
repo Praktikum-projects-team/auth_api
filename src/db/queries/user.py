@@ -13,11 +13,12 @@ def does_user_exist(login: str):
     return db.session.query(User.query.filter_by(login=login).exists()).scalar()
 
 
-def create_new_user(user):
+def create_new_user(user: dict) -> User:
     role = db.session.query(Role).filter(Role.name == RoleName.USER).first()
     new_user = User(**user, roles=[role])
     db.session.add(new_user)
     db.session.commit()
+    return new_user
 
 
 def add_login_history_record(user_id: UUID, user_agent: str):

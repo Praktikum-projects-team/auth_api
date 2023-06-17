@@ -32,7 +32,7 @@ def upgrade():
             "CREATE TABLE login_history_new ("
             "id UUID NOT NULL, "
             "user_id UUID NOT NULL, "
-            "user_agent VARCHAR(50) NOT NULL, "
+            "user_agent VARCHAR(250) NOT NULL, "
             "auth_datetime TIMESTAMP WITHOUT TIME ZONE NOT NULL, "
             "PRIMARY KEY (id, auth_datetime)"
             ") PARTITION BY RANGE (auth_datetime)"

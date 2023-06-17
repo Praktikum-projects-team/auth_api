@@ -50,16 +50,14 @@ class AppConfig(BaseSettings):
         return datetime.timedelta(days=float(val))
 
 
-app_config = AppConfig()
-jaeger_config = JaegerConfig()
-
-
 class OauthConfig(BaseSettings):
-    OAUTHLIB_INSECURE_TRANSPORT: int = Field(..., env='OAUTHLIB_INSECURE_TRANSPORT')
-    OAUTHLIB_RELAX_TOKEN_SCOPE: int = Field(..., env='OAUTHLIB_RELAX_TOKEN_SCOPE')
-    API_SERVICE_NAME: str = Field(..., env='API_SERVICE_NAME')
-    API_VERSION: str = Field(..., env='API_VERSION')
-    SCOPES: str = Field(..., env='SCOPES')
+    google_client_id: str = Field(..., env='GOOGLE_CLIENT_ID')
+    google_client_secret: str = Field(..., env='GOOGLE_CLIENT_SECRET')
+
+    yandex_client_id: str = Field(..., env='YANDEX_CLIENT_ID')
+    yandex_client_secret: str = Field(..., env='YANDEX_CLIENT_SECRET')
 
 
 oauth_config = OauthConfig()
+app_config = AppConfig()
+jaeger_config = JaegerConfig()

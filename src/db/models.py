@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 
 from db.pg_db import db
@@ -52,7 +52,7 @@ class LoginHistory(db.Model):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey(User.id), nullable=False)
-    user_agent = Column(String(150), nullable=False)
+    user_agent = Column(String(250), nullable=False)
     auth_datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, user_id, user_agent):
@@ -69,3 +69,11 @@ class UserRole(db.Model):
     user_id = Column(UUID(as_uuid=True), ForeignKey(User.id), primary_key=True, nullable=False)
     role_id = Column(UUID(as_uuid=True), ForeignKey(Role.id, ondelete='CASCADE'), primary_key=True, nullable=False)
     given_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+
+class OauthAccount(db.Model):
+    __tablename__ = 'oauth_accounts'
+
+    user_id = Column(UUID(as_uuid=True), ForeignKey(User.id), primary_key=True, nullable=False)
+    oauth_user_login = Column(Text, nullable=False)
+    provider = Column(String(100), primary_key=True, nullable=False)
