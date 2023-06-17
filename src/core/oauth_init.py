@@ -34,5 +34,6 @@ def init_oauth(app):
         client_id=oauth_config.yandex_client_id,
         client_secret=oauth_config.yandex_client_secret,
         access_token_url='https://oauth.yandex.ru/token',
-        authorize_url='https://oauth.yandex.ru/authorize'
+        authorize_url='https://oauth.yandex.ru/authorize',
+        userinfo_endpoint='https://login.yandex.ru/info',
     )
