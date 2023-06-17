@@ -29,7 +29,7 @@ def create_oauth_account(oauth_user: dict, provider: str) -> User:
             {'login': oauth_user['login'], 'password': secrets.token_urlsafe(10), 'name': oauth_user['name']}
         )
 
-    oauth_account = OauthAccount(oauth_user_login=oauth_user['login'], user_id=user.id, provider=provider)
+    oauth_account = OauthAccount(oauth_user_login=user.login, user_id=user.id, provider=provider)
     db.session.add(oauth_account)
     db.session.commit()
     return user
