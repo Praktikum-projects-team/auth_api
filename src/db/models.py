@@ -71,7 +71,7 @@ class UserRole(db.Model):
     given_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
 
-class OauthAccounts(db.Model):
+class OauthAccount(db.Model):
     __tablename__ = 'oauth_accounts'
 
     user_id = Column(UUID(as_uuid=True), ForeignKey(User.id), primary_key=True, nullable=False)
