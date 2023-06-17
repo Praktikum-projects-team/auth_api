@@ -4,8 +4,6 @@ monkey.patch_all()
 
 from app import app
 
-# app = create_app()
-
 
 # Todo: удалить после написания всех апи, временно оставлено в качестве пинга
 @app.route('/api/hello-world')
