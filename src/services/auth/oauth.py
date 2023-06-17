@@ -25,9 +25,9 @@ def get_oauth_user(user, provider):
 def create_oauth_account(oauth_user: dict, provider: str) -> User:
     user = User.query.filter_by(login=oauth_user['login']).first()
     if not user:
-        user = sign_up_user(
-            {'login': oauth_user['login'], 'password': secrets.token_urlsafe(10), 'name': oauth_user['name']}
-        )
+        user_info = oauth_user
+        user_info['password'] = secrets.token_urlsafe(10)
+        user = sign_up_user(user_info)
 
     oauth_account = OauthAccount(oauth_user_login=user.login, user_id=user.id, provider=provider)
     db.session.add(oauth_account)

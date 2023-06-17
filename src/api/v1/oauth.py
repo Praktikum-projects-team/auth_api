@@ -18,9 +18,7 @@ def login(provider: str):
 @oauth_bp.route('/<provider>/oauth2callback')
 def authorize(provider: str):
     provider_client = oauth.create_client(provider)
-    token = provider_client.authorize_access_token()
-    # resp = oauth.google.get('userinfo', token=token)
-    # user_info = resp.json()
+    provider_client.authorize_access_token()
     userinfo = provider_client.userinfo()
 
     oauth_user = get_oauth_user(userinfo, provider)
