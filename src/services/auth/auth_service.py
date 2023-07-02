@@ -38,6 +38,7 @@ def user_claims_to_access_token(user_login):
     user = get_user_by_login(user_login)
     user_roles = [r.name for r in user.roles]
     user_claim = {
+        'id': str(user.id),
         'name': user.name,
         'is_superuser': user.is_superuser,
         'roles': user_roles,
