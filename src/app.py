@@ -1,3 +1,6 @@
+import logging
+
+import logstash
 from flask import Flask, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -38,6 +41,19 @@ def init_extensions(app):
     FlaskInstrumentor().instrument_app(app)
 
 
+def config_log(app):
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(
+        logstash.LogstashHandler(
+            host=app.config['LOGSTASH_HOST'],
+            port=app.config['LOGSTASH_PORT'],
+            version=1,
+        )
+    )
+    app.logger = logging.LoggerAdapter(logger, {'tags': ['auth_api']})
+
+
 if app_config.enable_tracer:
     configure_tracer()
 
@@ -49,6 +65,7 @@ def create_app():
     register_blueprints(app)
     with app.app_context():
         upgrade()
+    config_log(app)
     return app
 
 

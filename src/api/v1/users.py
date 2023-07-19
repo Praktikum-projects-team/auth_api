@@ -1,7 +1,6 @@
-import logging
 from http import HTTPStatus
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 
@@ -40,7 +39,7 @@ def update_user_info():
         return err.messages, HTTPStatus.BAD_REQUEST
 
     user_update(current_user, body)
-    logging.info('User with email %s updated', current_user)
+    current_app.logger.info('User with email %s updated', current_user)
 
     return {'message': 'User updated successfully'}, HTTPStatus.CREATED
 
@@ -67,9 +66,9 @@ def change_user_login():
 
     try:
         user_change_login(current_user, body)
-        logging.info('User with email %s updated login successfully', current_user)
+        current_app.logger.info('User with email %s updated login successfully', current_user)
     except LoginAlreadyExists as err:
-        logging.warning('User with email %s denied to change login: new login already exists', current_user)
+        current_app.logger.warning('User with email %s denied to change login: new login already exists', current_user)
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return {'message': 'User login updated successfully'}, HTTPStatus.CREATED
@@ -87,9 +86,9 @@ def change_user_password():
 
     try:
         change_user_pw(current_user, body['old_password'], body['new_password'])
-        logging.info('User with email %s updated password successfully', current_user)
+        current_app.logger.info('User with email %s updated password successfully', current_user)
     except UserIncorrectPassword as err:
-        logging.warning('User with email %s denied to change password: incorrect old password', current_user)
+        current_app.logger.warning('User with email %s denied to change password: incorrect old password', current_user)
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return {'message': 'User password updated successfully'}, HTTPStatus.CREATED

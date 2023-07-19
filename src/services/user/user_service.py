@@ -1,5 +1,4 @@
-import logging
-
+from flask import current_app
 from flask_sqlalchemy.pagination import Pagination
 
 from db.queries.user import (
@@ -51,7 +50,7 @@ def user_update(login: str, new_data: dict):
     user.name = new_data['name']
 
     db.session.commit()
-    logging.info('User in db %s updated successfully', login)
+    current_app.logger.info('User in db %s updated successfully', login)
 
 
 def user_change_login(login: str, new_data: dict):
@@ -62,7 +61,7 @@ def user_change_login(login: str, new_data: dict):
     user.login = new_data['new_login']
 
     db.session.commit()
-    logging.info('User login in db %s updated successfully', login)
+    current_app.logger.info('User login in db %s updated successfully', login)
 
 
 def get_user_admin_info():
@@ -73,7 +72,7 @@ def get_user_info(user_id: UUID):
     user = get_user_by_id(user_id)
     if not user:
         raise UserNotFound('User not found')
-    logging.info('User in db %s found', user_id)
+    current_app.logger.info('User in db %s found', user_id)
 
     return user
 

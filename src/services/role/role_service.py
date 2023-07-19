@@ -1,5 +1,3 @@
-import logging
-
 from db.queries.roles import (
     get_all_roles,
     does_role_exists,
@@ -9,6 +7,8 @@ from db.queries.roles import (
     delete_role_data
 )
 from uuid import UUID
+
+from flask import current_app
 
 
 class RoleAlreadyExists(Exception):
@@ -25,17 +25,17 @@ def roles_get_data():
 
 def create_role(name: str):
     if does_role_exists(name):
-        logging.warning('Role %s already exists in db', name)
+        current_app.logger.warning('Role %s already exists in db', name)
         raise RoleAlreadyExists('Role already exist')
 
     create_new_role(name)
-    logging.info('Role %s created successfully in db', name)
+    current_app.logger.info('Role %s created successfully in db', name)
 
 
 def get_role_data(role_id: UUID):
     role = get_one_role(role_id)
     if not role:
-        logging.warning('Role %s not found in db', role_id)
+        current_app.logger.warning('Role %s not found in db', role_id)
         raise RoleNotFound('Role not found in db')
 
     return role
@@ -58,10 +58,10 @@ def update_role(role_id: UUID, name: str):
         raise RoleAlreadyExists('Role with this name already exist in db')
 
     update_role_data(role, name)
-    logging.info('Role in db %s updated successfully', name)
+    current_app.logger.info('Role in db %s updated successfully', name)
 
 
 def delete_role(role_id: UUID):
     role = get_role_data(role_id)
     delete_role_data(role)
-    logging.info('Role in db %s deleted successfully', role_id)
+    current_app.logger.info('Role in db %s deleted successfully', role_id)
