@@ -42,16 +42,15 @@ def init_extensions(app):
 
 
 def config_log(app):
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-    logger.addHandler(
+    app.logger = logging.getLogger(__name__)
+    app.logger.setLevel(logging.INFO)
+    app.logger.addHandler(
         logstash.LogstashHandler(
             host=app.config['LOGSTASH_HOST'],
             port=app.config['LOGSTASH_PORT'],
             version=1,
         )
     )
-    app.logger = logging.LoggerAdapter(logger, {'tags': ['auth_api']})
 
 
 if app_config.enable_tracer:
@@ -70,10 +69,15 @@ def create_app():
 
 
 app = create_app()
+logger = app.logger
 
 
 @app.before_request
 def before_request():
     request_id = request.headers.get('X-Request-Id')
+    app.logger = logging.LoggerAdapter(
+        logger=logger,
+        extra={'tags': ['auth_api'], 'X-Request-Id': request_id},
+    )
     if not request_id:
         raise RuntimeError('request id is required')
