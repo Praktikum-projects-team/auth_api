@@ -1,18 +1,17 @@
-import logging
 from http import HTTPStatus
 
-from flask import jsonify, request, Blueprint
-from flask_jwt_extended import get_jwt_identity, get_jwt, jwt_required
+from flask import Blueprint, current_app, jsonify, request
+from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 
-from api.v1.models.auth import sign_up_in, login_in, login_out
+from api.v1.models.auth import login_in, login_out, sign_up_in
 from services.auth.auth_service import (
-    sign_up_user,
-    login_user,
     UserAlreadyExists,
     UserIncorrectLoginData,
     add_token_to_block_list,
-    generate_token_pair
+    generate_token_pair,
+    login_user,
+    sign_up_user,
 )
 
 auth_bp = Blueprint('auth', __name__)
@@ -28,9 +27,9 @@ def sign_up():
 
     try:
         sign_up_user(user)
-        logging.info('User with email %s successfully signed in', user['login'])
+        current_app.logger.info('User with email %s successfully signed in', user['login'])
     except UserAlreadyExists as err:
-        logging.info('User with email %s denied to sign up: user already exists', user['login'])
+        current_app.logger.info('User with email %s denied to sign up: user already exists', user['login'])
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return jsonify(msg='User created'), HTTPStatus.CREATED
@@ -47,9 +46,9 @@ def login():
 
     try:
         tokens = login_user(user['login'], user['password'], user_agent=user_agent)
-        logging.info('User with email %s successfully logged in', user['login'])
+        current_app.logger.info('User with email %s successfully logged in', user['login'])
     except UserIncorrectLoginData as err:
-        logging.warning('User with email %s denied to login: incorrect login or password', user['login'])
+        current_app.logger.warning('User with email %s denied to login: incorrect login or password', user['login'])
         return jsonify(message=str(err)), HTTPStatus.UNAUTHORIZED
 
     return login_out.dump(tokens)
@@ -67,7 +66,7 @@ def check_access_token():
 def logout():
     token = get_jwt()
     token_type = token['type']
-    logging.info('Token_type: %s', token_type)
+    current_app.logger.info('Token_type: %s', token_type)
     add_token_to_block_list(token['jti'], token_type)
 
     return jsonify(msg=f'{token_type} token successfully revoked')

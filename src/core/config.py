@@ -1,4 +1,5 @@
 import datetime
+
 from pydantic import BaseSettings, Field, PostgresDsn, RedisDsn, validator
 
 
@@ -37,6 +38,9 @@ class AppConfig(BaseSettings):
     RATELIMIT_STRATEGY: str = 'fixed-window'
     RATELIMIT_HEADERS_ENABLED: bool = True
     RATELIMIT_DEFAULT: str = '20/minute'
+
+    LOGSTASH_HOST: str = Field(..., env='LOGSTASH_HOST')
+    LOGSTASH_PORT: int = Field(..., env='LOGSTASH_PORT')
 
     enable_tracer: bool = True
 

@@ -1,4 +1,5 @@
-version: '3'
+version: '3.5'
+
 services:
   postgres:
     container_name: postgres
@@ -13,6 +14,8 @@ services:
       timeout: 5s
       retries: 5
     restart: always
+    networks:
+      - cinema
 
   redis:
     container_name: redis
@@ -21,6 +24,8 @@ services:
       - ./.env
     volumes:
       - $HOME/redis/data:/var/lib/redis/data
+    networks:
+      - cinema
 
   auth:
     container_name: auth
@@ -30,6 +35,8 @@ services:
     depends_on:
       - redis
       - postgres
+    networks:
+      - cinema
 
   nginx:
     container_name: nginx
@@ -41,6 +48,8 @@ services:
       - auth
     ports:
       - "80:80"
+    networks:
+      - cinema
 
   jaeger:
     container_name: jaeger
@@ -57,3 +66,9 @@ services:
     restart: unless-stopped
     depends_on:
       - auth
+    networks:
+      - cinema
+
+networks:
+  cinema:
+    name: cinema
