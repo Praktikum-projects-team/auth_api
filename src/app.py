@@ -1,11 +1,13 @@
 import logging
 
 import logstash
+import sentry_sdk
 from flask import Flask, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_migrate import upgrade
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from api.v1.admin_roles import admin_roles_bp
 from api.v1.admin_users import admin_users_bp
@@ -39,6 +41,11 @@ def init_extensions(app):
     limiter = Limiter(key_func=get_remote_address)
     limiter.init_app(app)
     FlaskInstrumentor().instrument_app(app)
+    sentry_sdk.init(
+        dsn=app.config['SENTRY_DSN'],
+        integrations=[FlaskIntegration()],
+        traces_sample_rate=0.4
+    )
 
 
 def config_log(app):
