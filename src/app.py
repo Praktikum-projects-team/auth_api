@@ -15,12 +15,19 @@ from api.v1.auth import auth_bp
 from api.v1.models.marshmallow_init import init_marshmallow
 from api.v1.oauth import oauth_bp
 from api.v1.users import users_bp
-from core.config import app_config
+from core.config import app_config, sentry_config
 from core.oauth_init import init_oauth
 from core.tracing import configure_tracer
 from db.alembic_migrate_init import init_migration_tool
 from db.pg_db import db, init_db
 from services.auth.jwt_init import init_jwt
+
+
+sentry_sdk.init(
+    dsn=sentry_config.dns,
+    integrations=[FlaskIntegration()],
+    traces_sample_rate=0.4
+)
 
 
 def register_blueprints(app):
@@ -41,11 +48,6 @@ def init_extensions(app):
     limiter = Limiter(key_func=get_remote_address)
     limiter.init_app(app)
     FlaskInstrumentor().instrument_app(app)
-    sentry_sdk.init(
-        dsn=app.config['SENTRY_DSN'],
-        integrations=[FlaskIntegration()],
-        traces_sample_rate=0.4
-    )
 
 
 def config_log(app):

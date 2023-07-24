@@ -1,6 +1,9 @@
 import datetime
 
 from pydantic import BaseSettings, Field, PostgresDsn, RedisDsn, validator
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class JaegerConfig(BaseSettings):
@@ -62,6 +65,11 @@ class OauthConfig(BaseSettings):
     yandex_client_secret: str = Field(..., env='YANDEX_CLIENT_SECRET')
 
 
+class SentryConfig(BaseSettings):
+    dns: str = Field(..., env='SENTRY_DNS')
+
+
 oauth_config = OauthConfig()
 app_config = AppConfig()
 jaeger_config = JaegerConfig()
+sentry_config = SentryConfig()
