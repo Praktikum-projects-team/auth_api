@@ -93,3 +93,11 @@ def update_user_admin(user_id: UUID, body: dict):
 
     db.session.commit()
     logging.info('User in db %s updated successfully', user_id)
+
+
+def verify_user_email(login: str):
+    user = get_user_by_login(login)
+    user.email_verified = True
+
+    db.session.commit()
+    current_app.logger.info('User verified email %s', login)
