@@ -1,3 +1,5 @@
+import datetime
+
 from marshmallow import Schema, fields, validate
 
 from api.v1.models.common import PaginateOut
@@ -34,8 +36,15 @@ class LoginHistoryPaginated(ma.Schema):
     pagination = fields.Nested(PaginateOut)
 
 
+class VerifyEmail(Schema):
+    ttl = fields.DateTime(required=True)
+    redirect_link = fields.Str(required=True)
+    user_id = fields.UUID(required=True)
+
+
 user_schema = UsersSchema()
 user_change_data = UserChangeData()
 change_login = ChangeLogin()
 change_password = ChangePassword()
 login_history_paginated = LoginHistoryPaginated()
+email_verify = VerifyEmail()

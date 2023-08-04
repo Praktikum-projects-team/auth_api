@@ -29,13 +29,15 @@ class User(db.Model):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     name = Column(String(100), nullable=True)
     is_superuser = Column(Boolean, default=False)
+    email_verified = Column(Boolean, default=False)
     roles = db.relationship(Role, secondary='user_roles')
 
-    def __init__(self, login, password, name=None, is_superuser=False, roles=None):
+    def __init__(self, login, password, name=None, is_superuser=False, email_verified=False, roles=None):
         self.login = login
         self.password = password
         self.name = name
         self.is_superuser = is_superuser
+        self.email_verified = email_verified
         self.roles = roles or []
 
     def __repr__(self):

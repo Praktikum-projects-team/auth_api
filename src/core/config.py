@@ -66,7 +66,7 @@ class OauthConfig(BaseSettings):
 
 
 class SentryConfig(BaseSettings):
-    dns: str = Field(..., env='SENTRY_DNS')
+    dns: str = Field(..., env='SENTRY_DSN')
 
 
 oauth_config = OauthConfig()

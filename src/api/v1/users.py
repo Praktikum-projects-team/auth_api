@@ -1,18 +1,28 @@
 from http import HTTPStatus
 
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, redirect
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
+from datetime import datetime
 
 from api.v1.models.common import paginate_in
-from api.v1.models.users import change_login, change_password, login_history_paginated, user_change_data, user_schema
+from api.v1.models.users import (
+    change_login,
+    change_password,
+    login_history_paginated,
+    user_change_data,
+    user_schema,
+    email_verify
+)
 from services.auth.auth_service import UserIncorrectPassword, change_user_pw
 from services.user.user_service import (
     LoginAlreadyExists,
     user_change_login,
     user_get_data,
     user_login_history,
-    user_update
+    user_update,
+    verify_user_email,
+    InvalidUser
 )
 
 users_bp = Blueprint("user", __name__)
@@ -92,3 +102,24 @@ def change_user_password():
         return jsonify(message=str(err)), HTTPStatus.CONFLICT
 
     return {'message': 'User password updated successfully'}, HTTPStatus.CREATED
+
+
+@users_bp.route('/email_verification', methods=['PUT'])
+@jwt_required()
+def verify_email():
+    current_user = get_jwt_identity()
+    user_verified_data = request.get_json()
+    try:
+        body = email_verify.load(user_verified_data)
+    except ValidationError as err:
+        return err.messages, HTTPStatus.BAD_REQUEST
+
+    try:
+        if datetime.utcnow() <= body['ttl']:
+            verify_user_email(current_user, body)
+        else:
+            return {'message': 'Verification link has been expired'}, HTTPStatus.NOT_FOUND
+
+        return redirect(body['redirect_link'])
+    except InvalidUser as err:
+        return err.messages, HTTPStatus.BAD_REQUEST
