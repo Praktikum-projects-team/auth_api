@@ -24,6 +24,10 @@ class UserNotFound(Exception):
     ...
 
 
+class InvalidUser(Exception):
+    ...
+
+
 def user_get_data(login: str):
     return get_user_by_login(login)
 
@@ -95,9 +99,11 @@ def update_user_admin(user_id: UUID, body: dict):
     logging.info('User in db %s updated successfully', user_id)
 
 
-def verify_user_email(login: str):
+def verify_user_email(login: str, body: dict):
     user = get_user_by_login(login)
-    user.email_verified = True
-
-    db.session.commit()
-    current_app.logger.info('User verified email %s', login)
+    if user.id == body['user_id']:
+        user.email_verified = True
+        db.session.commit()
+        current_app.logger.info('User verified email %s', login)
+    else:
+        raise InvalidUser('User from the link and the current one do not match')

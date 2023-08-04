@@ -21,7 +21,8 @@ from services.user.user_service import (
     user_get_data,
     user_login_history,
     user_update,
-    verify_user_email
+    verify_user_email,
+    InvalidUser
 )
 
 users_bp = Blueprint("user", __name__)
@@ -113,9 +114,12 @@ def verify_email():
     except ValidationError as err:
         return err.messages, HTTPStatus.BAD_REQUEST
 
-    if datetime.utcnow() < body['ttl']:
-        verify_user_email(current_user)
-    else:
-        return {'message': 'Verification link has been expired'}, HTTPStatus.NOT_FOUND
+    try:
+        if datetime.utcnow() <= body['ttl']:
+            verify_user_email(current_user, body)
+        else:
+            return {'message': 'Verification link has been expired'}, HTTPStatus.NOT_FOUND
 
-    return redirect(body['redirect_link'])
+        return redirect(body['redirect_link'])
+    except InvalidUser as err:
+        return err.messages, HTTPStatus.BAD_REQUEST
